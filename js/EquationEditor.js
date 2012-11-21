@@ -71,7 +71,7 @@ Ext.EquationWindow = function(args) {
 	var hood = neighborhood(cell);
 	for(var i=0; i<hood.length; i++){
 		if(! hood[i].linkHidden){
-			var s = '<big><img width=16 height=16 src="/builder/images/add.png"/> ' + clean(hood[i].item.getAttribute("name")) + '</big>';
+			var s = '<big><img width=16 height=16 src="'+builder_path+'/images/add.png"/> ' + clean(hood[i].item.getAttribute("name")) + '</big>';
 			if(hood[i].type=="agent"){
 				s = "<i class='gray'>&nbsp;&nbsp;" + s + "</i>";
 			}

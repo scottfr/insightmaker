@@ -57,7 +57,23 @@ function isLocal() {
 mxGraph.prototype.stopEditing=function(a){if(this.cellEditor!==null){this.cellEditor.stopEditing(a)}}
 
 
-var equationRenderer;
+var equationRenderer = function(eq) {
+	var res = eq;
+	if (/\\n/.test(res)) {
+		var vals = res.match(/(.*?)\\n/);
+		res = vals[1] + "...";
+	}
+
+	res = res.replace(/</g, "&lt;");
+	res = res.replace(/>/g, "&gt;");
+	res = res.replace(/\[(.*?)\]/g, "<font color='Green'>[$1]</font>");
+	res = res.replace(/(&lt;&lt;.*?&gt;&gt;)/g, "<font color='Orange'>$1</font>");
+	res = res.replace(/(«.*?»)/g, "<font color='Orange'>$1</font>");
+	res = res.replace(/\b([\d\.e]+)\b/g, "<font color='DeepSkyBlue'>$1</font>");
+	res = res.replace(/(\{.*?\})/g, "<font color='Orange'>$1</font>");
+
+	return clean(res);
+};
 
 
 if (!isLocal()) {
@@ -74,7 +90,7 @@ if (!isLocal()) {
 
 try {
 	mxUtils.alert = function(message) {
-		Ext.example.msg("<table><tr><td valign='top'><img src='/builder/images/stop.png' style='padding-right:.3em;' width=48px height=48px  /></td><td>" + message + "</td></tr></table>", '');
+		Ext.example.msg("<table><tr><td valign='top'><img src='"+builder_path+"/images/stop.png' style='padding-right:.3em;' width=48px height=48px  /></td><td>" + message + "</td></tr></table>", '');
 	};
 } catch (err) {
 	alert("Insight Maker failed to load all its resources. Check your network connection and try to reload Insight Maker.");
@@ -115,9 +131,10 @@ function main() {
 	graph = new mxGraph();
 
 	var history = new mxUndoManager();
-	var node = mxUtils.load('/builder/resources/default-style.xml').getDocumentElement();
-	var dec = new mxCodec(node.ownerDocument);
-	dec.decode(node, graph.getStylesheet());
+	
+	var node = mxUtils.parseXml('<mxStylesheet> 	<add as="defaultVertex" extend="defaultVertex"> 		<add as="strokeColor" value="#666666"/> 		<add as="fontColor" value="#333333"/> 		<add as="fontSize" value="14"/> 		<add as="fontFamily" value="Comic Sans MS"/> 		<add as="strokeWidth" value="2"/> 	</add> 	<add as="defaultEdge" extend="defaultEdge"> 		<add as="labelBackgroundColor" value="white"/> 		<add as="rounded" value="1"/> 		<add as="fontSize" value="14"/> 		<add as="edgeStyle" value="elbowEdgeStyle"/> 		<add as="fontFamily" value="Comic Sans MS"/> 		<add as="strokeWidth" value="4"/> 	</add> 	<add as="stock" extend="defaultVertex"> 		<add as="fillColor" value="#A6D3F8"/> 	</add> 	<add as="state" extend="defaultVertex"> 		<add as="fillColor" value="#ffffff"/> 	</add> 	<add as="transition" extend="defaultEdge"> 		<add as="strokeColor" value="#000000"/> 		<add as="fontColor" value="#000000"/> 	</add> 	<add as="agents" extend="defaultVertex"> 		<add as="fillColor" value="#F0E68C"/> 		<add as="shape" value="cloud"/> 	</add> 	<add as="textArea" extend="defaultVertex"> 		<add as="strokeColor" value="none"/> 		<add as="fillColor" value="none"/> 		<add as="fontColor" value="black"/> 		<add as="fontSize" value="30"/> 		<add as="fontStyle" value="4"/> 	</add> 	<add as="text" extend="defaultVertex"> 		<add as="strokeColor" value="none"/> 		<add as="fillColor" value="none"/> 		<add as="fontColor" value="black"/> 		<add as="fontSize" value="30"/> 		<add as="fontStyle" value="4"/> 	</add> 	 	<add as="parameter" extend="defaultVertex"> 		<add as="shape" value="ellipse"/> 		<add as="perimeter" value="ellipsePerimeter"/> 		<add as="fillColor" value="#FDCDAC"/> 	</add> 	<add as="variable" extend="defaultVertex"> 		<add as="shape" value="ellipse"/> 		<add as="perimeter" value="ellipsePerimeter"/> 		<add as="fillColor" value="#FDCDAC"/> 	</add> 	<add as="action" extend="defaultVertex"> 		<add as="shape" value="ellipse"/> 		<add as="perimeter" value="ellipsePerimeter"/> 		<add as="fillColor" value="#FFFFFF"/> 	</add> 	<add as="converter" extend="defaultVertex"> 		<add as="shape" value="ellipse"/> 		<add as="perimeter" value="ellipsePerimeter"/> 		<add as="fillColor" value="#B3E2CD"/> 	</add> 	<add as="button" extend="defaultVertex"> 		<add as="rounded" value="1"/> 		<add as="glass" value="1"/> 		<add as="fillColor" value="#C0C0C0"/> 		<add as="fontColor" value="black"/> 		<add as="strokeWidth" value="3"/> 		<add as="fontFamily" value="Helvetica"/> 	</add> 	<add as="display" extend="defaultVertex"> 		<add as="shape" value="ellipse"/> 		<add as="fillColor" value="#FFFFFF"/> 		<add as="strokeColor" value="#FFFFFF"/> 		<add as="fontColor" value="#FFFFFF"/> 		<add as="opacity" value="0"/> 	</add> 	<add as="picture" extend="defaultVertex"> 		<add as="shape" value="image"/> 		<add as="verticalLabelPosition" value="bottom"/> 		<add as="verticalAlign" value="top"/> 	</add> 	 	<add as="entity" extend="defaultEdge"> 		<add as="strokeColor" value="#808080"/> 		<add as="fontColor" value="#808080"/> 		<add as="opacity" value="70"/> 		<add as="edgeStyle" value="straight"/> 		<add as="strokeWidth" value="2"/> 		<add as="dashed" value="1"/> 		<add as="noLabel" value="0"/> 	</add> 	<add as="flow" extend="defaultEdge"> 	</add> 	<add as="link" extend="defaultEdge"> 		<add as="strokeColor" value="#808080"/> 		<add as="fontColor" value="#808080"/> 		<add as="opacity" value="70"/> 		<add as="edgeStyle" value="straight"/> 		<add as="strokeWidth" value="2"/> 		<add as="dashed" value="1"/> 		<add as="noLabel" value="0"/> 	</add> 	 	<add as="line" extend="defaultVertex"> 		<add as="shape" value="line"/> 		<add as="strokeWidth" value="4"/> 		<add as="labelBackgroundColor" value="white"/> 		<add as="verticalAlign" value="top"/> 		<add as="spacingTop" value="8"/> 	</add> 	<add as="image" extend="defaultVertex"> 		<add as="shape" value="image"/> 		<add as="verticalLabelPosition" value="bottom"/> 		<add as="verticalAlign" value="top"/> 	</add> 	 	<add as="folder" extend="defaultVertex"> 		<add as="verticalAlign" value="top"/> 		<add as="dashed" value="1"/> 		<add as="fillColor" value="none"/> 		<add as="rounded" value="1"/> 	</add> </mxStylesheet> ');
+	var dec = new mxCodec(node);
+	dec.decode(node.documentElement, graph.getStylesheet());
 
 	graph.alternateEdgeStyle = 'vertical';
 	graph.connectableEdges = true;
@@ -400,6 +417,12 @@ function main() {
 			}
 		};
 	graph.addListener(mxEvent.CELL_CONNECTED, connectionChangeHandler);
+	
+	graph.addListener(mxEvent.CELLS_FOLDED, function(graph, e){
+		if(! e.properties.collapse){
+			graph.orderCells(false, e.properties.cells);
+		}
+	});
 
 	mainPanel.body.insertHtml("beforeBegin",  "<div id='mainGraph'  style='z-index:1000;position:absolute; width:100%;height:100%;display:none;'></div>");
 
@@ -531,7 +554,7 @@ function main() {
 	graph.setConnectable(is_editor);
 	graph.setDropEnabled(true);
 	graph.setSplitEnabled(false);
-	graph.connectionHandler.connectImage = new mxImage('/builder/images/connector.gif', 16, 16);
+	graph.connectionHandler.connectImage = new mxImage(builder_path+'/images/connector.gif', 16, 16);
 	graph.connectionHandler.isConnectableCell = function(cell){
 		//console.log(cell);
 		if(! cell){
@@ -572,7 +595,7 @@ function main() {
 
 	settingCell = graph.insertVertex(parent, null, primitiveBank.setting, 20, 20, 80, 40);
 	settingCell.visible = false;
-	var firstdisp = graph.insertVertex(parent, null, primitiveBank.display.cloneNode(true), 50, 20, 64, 64, "roundImage;image=/builder/images/DisplayFull.png;");
+	var firstdisp = graph.insertVertex(parent, null, primitiveBank.display.cloneNode(true), 50, 20, 64, 64, "roundImage;image="+builder_path+"/images/DisplayFull.png;");
 	firstdisp.visible = false;
 	firstdisp.setAttribute("AutoAddPrimitives", true);
 	firstdisp.setAttribute("name", "Default Display");
@@ -1285,24 +1308,6 @@ function main() {
 			return items.join(", ");
 		};
 
-	equationRenderer = function(eq) {
-		var res = eq;
-		if (/\\n/.test(res)) {
-			var vals = res.match(/(.*?)\\n/);
-			res = vals[1] + "...";
-		}
-
-		res = res.replace(/</g, "&lt;");
-		res = res.replace(/>/g, "&gt;");
-		res = res.replace(/\[(.*?)\]/g, "<font color='Green'>[$1]</font>");
-		res = res.replace(/(&lt;&lt;.*?&gt;&gt;)/g, "<font color='Orange'>$1</font>");
-		res = res.replace(/(«.*?»)/g, "<font color='Orange'>$1</font>");
-		res = res.replace(/\b([\d\.e]+)\b/g, "<font color='DeepSkyBlue'>$1</font>");
-		res = res.replace(/(\{.*?\})/g, "<font color='Orange'>$1</font>");
-
-		return clean(res);
-	};
-
 	var labelRenderer = function(eq) {
 			var res = eq;
 
@@ -1333,7 +1338,7 @@ function main() {
 			listConfig: {
 				emptyText: "No primitives exist in your model",
 				getInnerTpl: function() {
-					return '<center><div class="x-combo-list-item" style=\"white-space:normal\";><img src="/builder/images/SD/{text}.png" width=48 height=48/></div></center>';
+					return '<center><div class="x-combo-list-item" style=\"white-space:normal\";><img src="'+builder_path+'/images/SD/{text}.png" width=48 height=48/></div></center>';
 				}
 			}
 		});
@@ -1460,7 +1465,7 @@ function main() {
 			configPanel.setTitle("");
 		}
 
-		var descBase = "<br/><img style='float:left; margin-right: 7px' src='/builder/images/gui/help.png' width=32px height=32px />";
+		var descBase = "<br/><img style='float:left; margin-right: 7px' src='"+builder_path+"/images/gui/help.png' width=32px height=32px />";
 
 		var topDesc = "",
 			bottomDesc = "";
@@ -1469,7 +1474,7 @@ function main() {
 
 			//no primitive has been selected. Stick in empty text and sliders.
 			if (drupal_node_ID == -1 && slids.length == 0) {
-				topDesc = "<center><a href='/builder/resources/QuickStart.pdf' target='_blank'><img src='/builder/images/Help.jpg' width=217 height=164 /></a><br/><br/><br/>Or take a look at the <a href='http://InsightMaker.com/help' target='_blank'>Detailed Insight Maker Manual</a><br/><br/>There is also a <a href='http://www.systemswiki.org/index.php?title=Modeling_%26_Simulation_with_Insight_Maker' target='_blank'>free, on-line education course</a> which teaches you how to think in a systems manner using Insight Maker.</center>";
+				topDesc = "<center><a href='"+builder_path+"/resources/QuickStart.pdf' target='_blank'><img src='"+builder_path+"/images/Help.jpg' width=217 height=164 /></a><br/><br/><br/>Or take a look at the <a href='http://InsightMaker.com/help' target='_blank'>Detailed Insight Maker Manual</a><br/><br/>There is also a <a href='http://www.systemswiki.org/index.php?title=Modeling_%26_Simulation_with_Insight_Maker' target='_blank'>free, on-line education course</a> which teaches you how to think in a systems manner using Insight Maker.</center>";
 			} else {
 
 				var topDesc = clean(graph_description);

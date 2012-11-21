@@ -1303,7 +1303,7 @@ function createResultsWindow(displayInformation) {
 		allowDepress: true,
 		enableToggle: true,
 		pressed: true,
-		icon: '/builder/images/pause.png'
+		icon: builder_path+'/images/pause.png'
 	});
 
 	scripter.playBut.s = scripter;
@@ -1314,14 +1314,14 @@ function createResultsWindow(displayInformation) {
 			if (this.s.slider.getValue() == this.s.maxTime) {
 				this.s.slider.setValue(this.s.minTime);
 			}
-			this.s.playBut.setIcon("/builder/images/pause.png");
+			this.s.playBut.setIcon(builder_path+"/images/pause.png");
 			this.s.advanceTimer();
 			var instant = this;
 			this.s.animInter = setInterval(function() {
 				instant.s.advanceTimer()
 			}, this.s.combo.getValue() == -1 ? 200 : 100 / Math.min(.5, this.s.combo.getValue()));
 		} else {
-			this.s.playBut.setIcon("/builder/images/play.png");
+			this.s.playBut.setIcon(builder_path+"/images/play.png");
 			clearInterval(this.s.animInter);
 		}
 	});

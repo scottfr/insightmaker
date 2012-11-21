@@ -22,7 +22,7 @@ function mxIconSet(state)
 		
     if (isValued(cell) || cell.value.nodeName == "Action") {
         //equation
-        var img = mxUtils.createImage('/builder/images/equal.png');
+        var img = mxUtils.createImage(builder_path+'/images/equal.png');
         img.setAttribute('title', '');
         img.style.position = 'absolute';
         img.style.cursor = 'pointer';
@@ -61,7 +61,7 @@ function mxIconSet(state)
 
     if (cell.value.getAttribute("Note") != null && Ext.String.trim(cell.value.getAttribute("Note")) != "") {
         // Note
-        var img = mxUtils.createImage('/builder/images/note.png');
+        var img = mxUtils.createImage(builder_path+'/images/note.png');
         img.setAttribute('title', '');
         img.style.position = 'absolute';
         img.style.cursor = 'pointer';

@@ -22,7 +22,7 @@ function getGraphXml(graph) {
 function sendGraphtoServer(graph) {
 	
     Ext.Ajax.request({
-        url: '/builder/save.php',
+        url: builder_path+'/save.php',
         method: 'POST',
         params: {
             data: getGraphXml(graph),
@@ -322,7 +322,7 @@ function setPicture(cell) {
         if (cell.getAttribute("Image").substring(0, 4).toLowerCase() == "http") {
             styleString = mxUtils.setStyle(styleString, "image", cell.getAttribute("Image"));
         } else {
-            styleString = mxUtils.setStyle(styleString, "image", "/builder/images/SD/" + cell.getAttribute("Image") + ".png");
+            styleString = mxUtils.setStyle(styleString, "image", builder_path+"/images/SD/" + cell.getAttribute("Image") + ".png");
         }
         if (isTrue(cell.getAttribute("FlipVertical"))) {
             styleString = mxUtils.setStyle(styleString, "imageFlipV", 1);
