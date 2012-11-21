@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+	
+    <title>Insight Maker</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 
+
+	<meta http-equiv="X-UA-Compatible" content="chrome=IE8">
+	
+  <!--[if lte IE 8]>
+		  
+  <script type="text/javascript" 
+     src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">
+			 
+    </script>
+
+    <style>
+     /* 
+      CSS rules to use for styling the overlay:
+        .chromeFrameOverlayContent
+        .chromeFrameOverlayContent iframe
+        .chromeFrameOverlayCloseBar
+        .chromeFrameOverlayUnderlay
+     */
+    </style> 
+
+  <script type="text/javascript" >
+  
+  alert("You are using an old version of Internet Explorer that does not support Insight Maker.\n\nTo run Insight Maker either:\n\n* Update your copy of Internet Explorer to version 9 or newer.\n* Use a different web browser (we recommend Google Chrome).\n* Install the Chrome Frame browser plug-in for Internet Explorer (you will be prompted to do this after closing this message).\n\nEither of these three options will allow you to run Insight Maker.");
+  
+	 window.attachEvent("onload", function() {
+	        CFInstall.check({
+	          mode: "inline", // the default
+	          node: "prompt"
+	        });
+	      });
+			 
+    </script>
+	<![endif]-->
+	
+ 
+ <link rel="stylesheet" type="text/css" href="resources/framewarp/framewarp.css" />
+ 	<link rel="stylesheet" type="text/css" href="resources/ext/resources/css/ext-all-gray.css" />
+ 	
+
+	<link rel="stylesheet" type="text/css" href="css/BoxSelect.css" />
+	<link rel="stylesheet" type="text/css" href="css/insighteditor.css" />
+	
+
+
+</head>
+<body onbeforeunload="return confirmClose();">
+	
+
+<div id="loading-mask"></div>
+<div id="loading">
+  <div class="loading-indicator">
+    Loading Insight Maker...
+	<br/><p>
+	<img src="images/loading.gif" width=54 height=55/></p><br/>
+	(This may take a few moments)
+  </div>
+</div>
+<div id="toplinks-holder" name="toplinks-holder"></div>
+
+<script type="text/javascript" src="resources/ext/ext-all.js"></script>
+
+<script type="text/javascript">
+	var base_path = "";
+	var logged_in = true;
+	var drupal_node_ID = -1;
+	var graph_source_data = "";
+	var graph_title = "";
+	var graph_description = "";
+	var graph_tags = "";
+	var saved_enabled = false;
+	var is_editor = true;
+	var is_embed = false;
+	var is_topBar = true;
+	var is_sideBar = true;
+	var is_zoom = true;
+</script>
+
+
+	<div id="header"><div style="float:right;margin:5px;" class="x-small-editor"></div></div>
+
+	
+	<script type="text/javascript">
+	var scriptBase = base_path;
+	var mxBasePath = base_path;
+	var mxLoadResources = false;
+	var mxLoadStylesheets = false;
+	</script>
+	
+	<script type="text/javascript" src="js/SharedJS.js"></script>
+	<script type="text/javascript" src="resources/mxClient.js"></script>
+	<script type="text/javascript" src="js/Ext.ux.util.js"></script>
+	<script type="text/javascript" src="js/ExtOverrides.js"></script>
+	<script type="text/javascript" src="js/graph.js"></script>
+	<script type="text/javascript" src="js/InsightEditor.js"></script>
+	<script type="text/javascript" src="js/Utilities.js"></script>		
+	<script type="text/javascript" src="js/RibbonPanel.js"></script>
+	<script type="text/javascript" src="js/ConfigPanel.js"></script>
+	<script type="text/javascript" src="js/TimeSettings.js"></script>
+	<script type="text/javascript" src="js/EquationEditor.js"></script>
+	<script type="text/javascript" src="js/RichTextEditor.js"></script>
+	<script type="text/javascript" src="js/ConverterEditor.js"></script>
+	<script type="text/javascript" src="js/DataImporter.js"></script>
+	<script type="text/javascript" src="js/FindReplace.js"></script>
+	<script type="text/javascript" src="js/UnitsEditor.js"></script>
+	<script type="text/javascript" src="js/Sensitivity.js"></script>
+	<script type="text/javascript" src="js/ModelImporter.js"></script>
+	<script type="text/javascript" src="js/Sanitize.js"></script>
+	<script type="text/javascript" src="js/Results.js"></script>
+	<script type="text/javascript" src="resources/jquery.js"></script> 
+	<script type="text/javascript" src="resources/raphael.js"></script>
+	<script type="text/javascript" src="js/scratchpad.js"></script>
+	<script type="text/javascript" src="js/BoxSelect.js"></script>
+	<script type="text/javascript" src="js/HoverIcons.js"></script>
+	<script type="text/javascript" src="js/API/API.js"></script>
+	<script type="text/javascript" src="js/TextEquations.js"></script>
+	<script type="text/javascript" src="resources/exporter/Exporter.js"></script>
+	<script type="text/javascript" src="resources/exporter/downloadify.min.js"></script>
+	<script type="text/javascript" src="resources/exporter/swfobject.js"></script>
+	<script type="text/javascript" src="resources/exporter/Formatter.js"></script>
+	<script type="text/javascript" src="resources/exporter/Base64.js"></script>
+	<script type="text/javascript" src="resources/exporter/Button.js"></script>
+	<script type="text/javascript" src="resources/exporter/csvFormatter/CsvFormatter.js"></script>
+	<script type="text/javascript" src="js/API/tests.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/OO.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/unitsStructure.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/units.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/bignum/biginteger.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/bignum/schemeNumber.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/antlr3-all-min.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/output/FormulaLexer.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/output/FormulaParser.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/rand.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/random.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/formula.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/calc/functions.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/Functions.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/Classes.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/Primitives.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/Simulator.js"></script>
+	<script type="text/javascript" src="js/SimulationEngine/Modeler.js"></script>
+	
+	
+
+	<script type="text/javascript" src="resources/framewarp/framewarp.js"></script> 
+	
+</body>
+</html>
+
