@@ -65,12 +65,12 @@ defineFunction("RandTriangular", {params:[{name:"Minimum", noUnits:true, noVecto
 });
 
 defineFunction("Real", {params:[{name: "Number", noVector: true}]}, function(x){
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn["real-part"](r.value);
 	return r;
 });
 defineFunction("Imag", {params:[{name: "Number", noVector: true}]}, function(x){
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn["imag-part"](r.value);
 	return r;
 });
@@ -78,52 +78,40 @@ defineFunction("Magnitude", {params:[{name: "Number"}]}, function(x){
 	if(x[0].toNum() instanceof Vector){
 		return functionBank["sqrt"]([functionBank["sum"]([mult(x[0], x[0])])])
 	}
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn.magnitude(r.value);
 	return r;
 });
 defineFunction("Angle", {params:[{name: "Number", noVector: true}]}, function(x){
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn.angle(r.value);
 	return r;
 });
 defineFunction("Abs", {params:[{name: "Number", noVector: true}]}, function(x){
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn.abs(r.value);
 	return r;
 });
 defineFunction("sin", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
-	r.value = fn.sin(r.value);
-	return r;
+	return new Material(fn.sin(x[0].toNum().value));
 });
 defineFunction("cos", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
-	r.value = fn.cos(r.value);
-	return r;
+	return new Material(fn.cos(x[0].toNum().value));
 });
 defineFunction("tan", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
-	r.value = fn.tan(r.value);
-	return r;
+	return new Material(fn.tan(x[0].toNum().value));
 });
 defineFunction("asin", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
-	r.value = fn.asin(r.value);
-	return r;
+	return new Material(fn.asin(x[0].toNum().value));
 });
 defineFunction("acos", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
-	r.value = fn.acos(r.value);
-	return r;
+	return new Material(fn.acos(x[0].toNum().value));
 });
 defineFunction("atan", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
-	r.value = fn.atan(r.value);
-	return r;
+	return new Material(fn.atan(x[0].toNum().value));
 });
 defineFunction("Sqrt", {params:[{name: "Number", noVector: true}]}, function(x){
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn.sqrt(r.value);
 	for (var i = 0; i < r.units.exponents.length; i++) {
 		r.units.exponents[i] = r.units.exponents[i] / 2;
@@ -131,44 +119,38 @@ defineFunction("Sqrt", {params:[{name: "Number", noVector: true}]}, function(x){
 	return r;
 });
 defineFunction("Ln", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
-	r.value = fn.log(r.value);
-	return r;
+	return new Material(fn.log(x[0].toNum().value));
 });
 defineFunction("Log", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
-	r.value = fn.log(r.value, "10");
-	return r;
+	return new Material(fn.log(x[0].toNum().value, 10));
 });
 defineFunction("Logit", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn["-"](fn.log(r.value), fn.log(fn["-"](1, r.value)));
 	return r;
 });
 defineFunction("Expit", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn["/"](1, fn["+"](1, fn.exp(fn["-"](r.value)))) ;
 	return r;
 });
 defineFunction("Round", {params:[{name: "Number", noVector: true, noUnits: false}]}, function(x){
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn.round(r.value);
 	return r;
 });
 defineFunction("Ceiling", {params:[{name: "Number", noVector: true, noUnits: false}]}, function(x){
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn.ceiling(r.value);
 	return r;
 });
 defineFunction("Floor", {params:[{name: "Number", noVector: true, noUnits: false}]}, function(x){
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn.floor(r.value);
 	return r;
 });
 defineFunction("Exp", {params:[{name: "Number", noVector: true, noUnits: true}]}, function(x){
-	var r = x[0].toNum().clone();
-	r.value = fn.exp(r.value);
-	return r;
+	return new Material(fn.exp(x[0].toNum().value));
 });
 functionBank["ifthenelse"] = function(x) {
 	testArgumentsSize(x, "IfThenElse", 3, 3);
@@ -465,34 +447,40 @@ defineFunction("Difference", {params:[{name: "Vector 1", needVector: true}, {nam
 });
 
 defineFunction("Factorial", {params: [{name: "Number", noUnits: true, noVector:true}]}, function(x){
-	var r = x[0].toNum().clone();
-	r.value = factorial(r.value);
-	return r;
+	return new Material(factorial(x[0].toNum().value));
 });
 
 defineFunction("Max", {params: {name: "Items..."}, prep: function(x){return functionBank["join"](x).toNum().items}}, function(x){
-	var maxItem = x[0].clone();
-	for (var i = 1; i < x.length; i++) {
-		if (greaterThan(x[i], maxItem)) {
-			maxItem = x[i].clone();
-		}
-		if (maxItem.units.unitless()) {
-			maxItem.units = x[i].units;
+	var maxIndex = 0;
+	for (var i = 0; i < x.length; i++) {
+	 	if(! isNaN(0+x[i].value)){
+	 		maxIndex = i;
+			break;
+	 	}
+ 	}
+	i=i+1;
+	for (i; i < x.length; i++) {
+		if (greaterThan(x[i], x[maxIndex])) {
+			maxIndex = i;
 		}
 	}
-	return maxItem;
+	return x[maxIndex];
 });
 defineFunction("Min", {params:{name: "Items..."}, prep:function(x){return functionBank["join"](x).toNum().items}}, function(x){
-	var minItem = x[0].clone();
-	for (var i = 1; i < x.length; i++) {
-		if (lessThan(x[i], minItem)) {
-			minItem = x[i].clone();
-		}
-		if (minItem.units.unitless()) {
-			minItem.units = x[i].units;
+	var minIndex = 0;
+	for (var i = 0; i < x.length; i++) {
+	 	if(! isNaN(0+x[i].value)){
+	 		minIndex = i;
+			break;
+	 	}
+ 	}
+	i=i+1
+	for (i; i < x.length; i++) {
+		if (lessThan(x[i], x[minIndex])) {
+			minIndex = i;
 		}
 	}
-	return minItem;
+	return x[minIndex];
 });
 defineFunction("Mean", {params:{name: "Items..."}, prep:function(x){return functionBank["join"](x).toNum().items}}, function(x){
 	var sum = x[0];
@@ -558,7 +546,7 @@ defineFunction("Correlation", {params:  [{name: "Vector 1", needVector: true}, {
 });
 functionBank["count"] = function(x) {
 	x = functionBank["join"](x).items;
-	return new Material(x.length);
+	return new Material(sn("#e"+x.length));
 };
 functionBank["flatten"] = function(x) {
 	x = functionBank["join"](x).items;

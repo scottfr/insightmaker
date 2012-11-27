@@ -50,8 +50,8 @@ DataBank.method("clone", function(){
 })
 
 DataBank.method("getSeries", function(n) {
-	if (indexOf(this.names, n) > -1) {
-		return this.dataSeries[indexOf(this.names, n)];
+	if (this.names.indexOf(n) > -1) {
+		return this.dataSeries[this.names.indexOf(n)];
 	} else {
 
 		this.names.push(n);
@@ -92,9 +92,9 @@ function ExpGroup(n , kv , iv){
   this.k = kv;
  
     for(var i=1; i<= n; i++){
-        this.stocks.push(iv.clone());
+        this.stocks.push(iv);
     }
-    this.out = iv.clone();
+    this.out = iv;
   }
   
 ExpGroup.method("moveForward", function( inp ){

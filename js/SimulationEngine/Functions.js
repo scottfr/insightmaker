@@ -16,23 +16,23 @@ defineFunction("Stop", {params:[]}, function(x) {
 });
 
 defineFunction("Time", {params:[]}, function(x) {
-	return time.clone();
+	return time;
 });
 
 defineFunction("TimeStep", {params:[]}, function(x) {
-	return timeStep.clone();
+	return timeStep;
 });
 
 defineFunction("TimeLength", {params:[]}, function(x) {
-	return timeLength.clone();
+	return timeLength;
 });
 
 defineFunction("TimeStart", {params:[]}, function(x) {
-	return timeStart.clone();
+	return timeStart;
 });
 
 defineFunction("TimeEnd", {params:[]}, function(x) {
-	return plus(timeStart, timeLength).clone();
+	return plus(timeStart, timeLength);
 });
 
 defineFunction("Seconds", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
@@ -42,10 +42,7 @@ defineFunction("Seconds", { params:[{name: "Value", defaultVal: "time", noVector
 	} else {
 		item = x[0].toNum();
 	}
-	return mult(item, new Material(1, new UnitStore([{
-		id: "seconds",
-		exponent: -1
-	}])));
+	return mult(item, new Material(1, new UnitStore(["seconds"],[-1])));
 });
 
 defineFunction("Minutes", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
@@ -55,10 +52,7 @@ defineFunction("Minutes", { params:[{name: "Value", defaultVal: "time", noVector
 	} else {
 		item = x[0].toNum();
 	}
-	return mult(item, new Material(1, new UnitStore([{
-		id: "minutes",
-		exponent: -1
-	}])));
+	return mult(item, new Material(1, new UnitStore(["minutes"],[-1])));
 });
 
 defineFunction("Hours", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
@@ -68,10 +62,7 @@ defineFunction("Hours", { params:[{name: "Value", defaultVal: "time", noVector: 
 	} else {
 		item = x[0].toNum();
 	}
-	return mult(item, new Material(1, new UnitStore([{
-		id: "hours",
-		exponent: -1
-	}])));
+	return mult(item, new Material(1, new UnitStore(["hours"],[-1])));
 });
 
 defineFunction("Days", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
@@ -81,10 +72,7 @@ defineFunction("Days", { params:[{name: "Value", defaultVal: "time", noVector: t
 	} else {
 		item = x[0].toNum();
 	}
-	return mult(item, new Material(1, new UnitStore([{
-		id: "days",
-		exponent: -1
-	}])));
+	return mult(item, new Material(1, new UnitStore(["days"],[-1])));
 });
 
 defineFunction("Weeks", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
@@ -94,10 +82,7 @@ defineFunction("Weeks", { params:[{name: "Value", defaultVal: "time", noVector: 
 	} else {
 		item = x[0].toNum();
 	}
-	return mult(item, new Material(1, new UnitStore([{
-		id: "weeks",
-		exponent: -1
-	}])));
+	return mult(item, new Material(1, new UnitStore(["weeks"],[-1])));
 });
 
 defineFunction("Months", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
@@ -107,10 +92,7 @@ defineFunction("Months", { params:[{name: "Value", defaultVal: "time", noVector:
 	} else {
 		item = x[0].toNum();
 	}
-	return mult(item, new Material(1, new UnitStore([{
-		id: "months",
-		exponent: -1
-	}])));
+	return mult(item, new Material(1, new UnitStore(["months"],[-1])));
 });
 
 defineFunction("Years", {params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
@@ -120,10 +102,7 @@ defineFunction("Years", {params:[{name: "Value", defaultVal: "time", noVector: t
 	} else {
 		item = x[0].toNum();
 	}
-	return mult(item, new Material(1, new UnitStore([{
-		id: "years",
-		exponent: -1
-	}])));
+	return mult(item, new Material(1, new UnitStore(["years"],[-1])));
 });
 
 defineFunction("Unitless", { params:[{name: "Value",  noVector: true}]}, function(x) {
@@ -217,7 +196,7 @@ defineFunction("Pulse", { params:[{name: "Start Time",  noVector: true}, {name: 
 	var repeat = new Material(0);
 
 	if (x.length > 1) {
-		height = x[1].toNum().clone();
+		height = x[1].toNum();
 		if (x.length > 2) {
 			width = x[2].toNum();
 			if (x.length > 3) {
@@ -255,7 +234,7 @@ defineFunction("Ramp", { params: [{name: "Start Time",  noVector: true}, {name: 
 	var finish = x[1].toNum();
 	var height = new Material(1);
 	if (x.length == 3) {
-		height = x[2].toNum().clone();
+		height = x[2].toNum();
 	}
 	if (unitless(start.units)) {
 		start.units = time.units.clone();
@@ -277,7 +256,7 @@ defineFunction("Step", { params: [{name: "Start Time",  noVector: true},  {name:
 	var start = x[0].toNum();
 	var height = new Material(1);
 	if (x.length == 2) {
-		height = x[1].toNum().clone();
+		height = x[1].toNum();
 	}
 	if (unitless(start.units)) {
 		start.units = time.units.clone();
@@ -292,7 +271,7 @@ functionBank["staircase"] = functionBank["step"];
 
 defineFunction("Smooth", {params: [{name: "[Primitive]",  noVector: true, needPrimitive: true}, {name: "Length",  noVector: true}, {name: "Initial Value",  noVector: true, defaultVal: "None"}]}, function(x) {
 
-	if (fn["<="](x[1].toNum().value, zero.value)) {
+	if (x[1].toNum().value <= 0) {
 		throw "MSG: The smoothing period must be greater than 0.";
 	}
 
@@ -306,7 +285,7 @@ defineFunction("Smooth", {params: [{name: "[Primitive]",  noVector: true, needPr
 
 defineFunction("Delay", {params: [{name: "[Primitive]",  noVector: true, needPrimitive: true}, {name: "Length",  noVector: true}, {name: "Initial Value",  noVector: true, defaultVal: "None"}]}, function(x) {
 
-	if (fn["<"](x[1].toNum().value, zero.value)) {
+	if (x[1].toNum().value < 0) {
 		throw "MSG: The delay must be greater than or equal to 0.";
 	}
 	if (x.length == 2) {
@@ -319,7 +298,7 @@ defineFunction("Delay", {params: [{name: "[Primitive]",  noVector: true, needPri
 
 defineFunction("Delay1", {params: [{name: "[Primitive]",  noVector: true, needPrimitive: true}, {name: "Length",  noVector: true}, {name: "Initial Value",  noVector: true, defaultVal: "None"}]}, function(x) {
 
-	if (fn["<="](x[1].toNum().value, zero.value)) {
+	if (x[1].toNum().value <= 0) {
 		throw "MSG: The delay must be greater than 0.";
 	}
 
@@ -333,7 +312,7 @@ defineFunction("Delay1", {params: [{name: "[Primitive]",  noVector: true, needPr
 
 defineFunction("Delay3", {params: [{name: "[Primitive]",  noVector: true, needPrimitive: true}, {name: "Length",  noVector: true}, {name: "Initial Value",  noVector: true, defaultVal: "None"}]}, function(x) {
 
-	if (fn["<="](x[1].toNum().value, zero.value)) {
+	if (x[1].toNum().value <= 0) {
 		throw "MSG: The delay must be greater than 0.";
 	}
 
@@ -346,7 +325,7 @@ defineFunction("Delay3", {params: [{name: "[Primitive]",  noVector: true, needPr
 });
 
 defineFunction("Exp", { params: [{name: "Number",  noVector: true, noUnits: true}]}, function(x) {	
-	var r = x[0].toNum().clone();
+	var r = x[0].toNum();
 	r.value = fn.exp(r.value);
 	if(fn["imag-part"](r.value) != 0){
 		throw("MSG: Exp() function resulted in an imaginary result.");
@@ -399,7 +378,7 @@ function getPopulation(item){
 functionBank["populationsize"] = function(x) {
 	testArgumentsSize(x, "PopulationSize", 1, 1);
 	if( x[0] instanceof Agents){
-		return new Material(x[0].agents.length);
+		return new Material(sn("#e"+x[0].agents.length));
 	}
 	throw "MSG: PopulationSize must be passed an agent population as an argument.";
 }
@@ -453,10 +432,16 @@ defineFunction("Value", {params: [{name: "[Population]"}, {needPrimitive: true, 
 	}
 	if(population !== null){
 		var res = [];
+		var j = -1;
 		for(var i = 0; i < population.length(); i++){
-			for(var j = 0; j < population.items[i].children.length; j++){
-				if(population.items[i].children[j].id == id){
-					res.push(population.items[i].children[j]);
+			if(j != -1){
+				res.push(population.items[i].children[j]);
+			}else{
+				for(var j = 0; j < population.items[i].children.length; j++){
+					if(population.items[i].children[j].id == id){
+						res.push(population.items[i].children[j]);
+						break;
+					}
 				}
 			}
 		}
@@ -695,7 +680,7 @@ function agents(obj){
 }
 
 defineFunction("Index", {params: [{noVector: true, needAgent: true, name: "[Agent]"}]}, function(x) {
-	return new Material(x[0].index+1);
+	return new Material(sn("#e"+(x[0].index+1)));
 });
 
 
@@ -825,16 +810,16 @@ defineFunction("Move", {params: [{needAgent: true, name: "[Mover]"}, {needVector
 
 defineFunction("MoveTowards", {params: [{needAgent: true, name: "[Mover]"}, {name: "[Target]"}, {name: "Distance", noVector: true}]}, function(x) {
 	var a = x[0];
-	var l1 = (x[1] instanceof Vector)?x[1]:x[1].location;
+	var l1 = (x[1] instanceof Vector)?x[1]:agent(x[1]).location;
 	var l2 = a.location;
 	
-
 	var distx = minus(l1.items[0], l2.items[0]);
 	var disty = minus(l1.items[1], l2.items[1]);
 	
 	if(distx.value==0 && disty.value==0){
 		return new Material(1);
 	}
+	
 	
 	if(a.parent.geoWrap){
 		
@@ -850,13 +835,12 @@ defineFunction("MoveTowards", {params: [{needAgent: true, name: "[Mover]"}, {nam
 		}
 	}
 	
-	
-	
 	var dir = new Vector([distx, disty])
 	
 	//var dir = minus(agent(x[1]).location, agent(x[0]).location);
 
-	shiftLocation(x[0], plus(x[0].location, mult(dir, div(x[2],distance(x[0], x[1])))));
+	shiftLocation(x[0], plus(x[0].location, mult(dir, div(x[2],distance(x[0], (x[1] instanceof Vector)?x[1]:agent(x[1]))))));
+	
 	return new Material(1);
 });
 

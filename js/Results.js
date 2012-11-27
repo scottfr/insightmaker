@@ -10,6 +10,9 @@ terms of the Insight Maker Public License (http://insightMaker.com/impl).
 
 
 function commaStr(nStr) {
+	//if(nStr instanceof String){
+	//	return nStr;
+	//}
 	if (nStr >= 1e9 || nStr <= 1e-9 && nStr != 0) {
 		return nStr.toPrecision(3);
 	} else {
@@ -600,6 +603,11 @@ function openDisplayConfigure(win) {
 								w.displayInformation.maps.splice(i,1);
 							}
 						}
+						for(var i=w.displayInformation.histograms.length-1; i>=0; i--){
+							if(w.displayInformation.histograms[i].id == d.id){
+								w.displayInformation.histograms.splice(i,1);
+							}
+						}
 						w.tabs.getActiveTab().add(renderDisplay(d, w.displayInformation));
 						displayConfigWin.hide();
 
@@ -684,6 +692,7 @@ function renderDisplay(display, displayInformation) {
 	}
 
 	var chart;
+	var histograms = [];
 	if (type == "Tabular") {
 		var cols = [{
 			header: "Time",
@@ -700,7 +709,7 @@ function renderDisplay(display, displayInformation) {
 						sortable: true,
 						flex: 1,
 						dataIndex: "series" + i,
-						renderer: commaStr
+						renderer: displayInformation.renderers[i]
 					});
 				}
 			}
@@ -733,7 +742,7 @@ function renderDisplay(display, displayInformation) {
 		var displayNames2 = [];
 		var displaySeries = [];
 		
-		var defaultColors = [ "#94ae0a", "#115fa6","#a61120", "#ff8809", "#ffd13e", "#a61187", "#24ad9a", "#7c7474", "#a66111"];
+		var defaultColors = [ "#94ae0a", "#115fa6","#a61120", "#ff8809", "#ffd13e", "#a61187", "#24ad9a", "#7c7474", "#a66111" ];
 		var defaultColorIndex = 0;
 		var colors = [];
 
@@ -742,21 +751,24 @@ function renderDisplay(display, displayInformation) {
 			var titles = [];
 			for (var j = 0; j < primitives.length; j++) {
 				for(var i=0; i< displayInformation.ids.length; i++){
-					if(primitives[j]==displayInformation.ids[i]){
-						
-						var left = primitives2.indexOf(primitives[j]) == -1
-						if (left) {
-							if(! isGray(displayInformation.colors[i])){
-								colors.push(displayInformation.colors[i]);
-							}else{
-								colors.push(defaultColors[defaultColorIndex]);
-								defaultColorIndex++;
-								defaultColorIndex = defaultColorIndex % defaultColors.length;
-							}
+					if(primitives[j] == displayInformation.ids[i]){
+						if(displayInformation.renderers[i]){
+							var left = primitives2.indexOf(primitives[j]) == -1
+							if (left) {
+								if(! isGray(displayInformation.colors[i])){
+									colors.push(displayInformation.colors[i]);
+								}else{
+									colors.push(defaultColors[defaultColorIndex]);
+									defaultColorIndex++;
+									defaultColorIndex = defaultColorIndex % defaultColors.length;
+								}
 							
-							fields.push("series" + i);
-							titles.push(displayInformation.headers[i]);
-						};
+								fields.push("series" + i);
+								titles.push(displayInformation.headers[i]);
+							}
+						}else{
+							histograms.push(createHistogramChart(displayInformation, i));
+						}
 					}
 				}
 			}
@@ -787,60 +799,64 @@ function renderDisplay(display, displayInformation) {
 
 				for(var i=0; i< displayInformation.ids.length; i++){
 					if(primitives[j]==displayInformation.ids[i]){
-						var left = primitives2.indexOf(primitives[j]) == -1
-						var x = "series" + i;
+						//console.log(displayInformation.ids[i])
+						//console.log(displayInformation.renderers[i])
+						if(displayInformation.renderers[i]){
 						
-						var c = null;
-						if(! isGray(displayInformation.colors[i])){
-							c = displayInformation.colors[i];
-						}else{
-							c = defaultColors[defaultColorIndex];
-							defaultColorIndex++;
-							defaultColorIndex = defaultColorIndex % defaultColors.length;
-						}
-							
-						var strokeStyle = {
-								stoke: c,
-								fill: c,
-								'stroke-width': 3
-						};
-						if(! isTrue(display.getAttribute("showLines"))){
-							strokeStyle.opacity = 0
-							strokeStyle.stroke = "none";
-						}
-							
-						if (left) {
-							displayNames1.push(displayInformation.headers[i])
-							displayIds1.push(x);
-						} else {
-							displayNames2.push(displayInformation.headers[i])
-							displayIds2.push(x);
-						};
-						displaySeries.push({
-							type: 'line',
-							axis: left ? "left" : "right",
-							xField: "Time",
-							yField: left ? displayIds1[displayIds1.length - 1] : displayIds2[displayIds2.length - 1],
-							title: left ? displayNames1[displayNames1.length - 1] : displayNames2[displayNames2.length - 1],
-							showMarkers: isTrue(display.getAttribute("showMarkers")),
-							smooth: false,
-							style: strokeStyle,
-							tips: {
-								trackMouse: true,
-								width: 160,
-								renderer: function(storeItem, item) {
-									this.setTitle(clean(item.series.title) + ":<br/>" + displayInformation.times[item.value[0]] + ", " + commaStr(item.value[1]));
-								}
+							var left = primitives2.indexOf(primitives[j]) == -1
+							var x = "series" + i;
+						
+							var c = null;
+							if(! isGray(displayInformation.colors[i])){
+								c = displayInformation.colors[i];
+							}else{
+								c = defaultColors[defaultColorIndex];
+								defaultColorIndex++;
+								defaultColorIndex = defaultColorIndex % defaultColors.length;
 							}
+							
+							var strokeStyle = {
+									stoke: c,
+									fill: c,
+									'stroke-width': 3
+							};
+							if(! isTrue(display.getAttribute("showLines"))){
+								strokeStyle.opacity = 0
+								strokeStyle.stroke = "none";
+							}
+							
+							if (left) {
+								displayNames1.push(displayInformation.headers[i])
+								displayIds1.push(x);
+							} else {
+								displayNames2.push(displayInformation.headers[i])
+								displayIds2.push(x);
+							};
+							displaySeries.push({
+								type: 'line',
+								axis: left ? "left" : "right",
+								xField: "Time",
+								yField: left ? displayIds1[displayIds1.length - 1] : displayIds2[displayIds2.length - 1],
+								title: left ? displayNames1[displayNames1.length - 1] : displayNames2[displayNames2.length - 1],
+								showMarkers: isTrue(display.getAttribute("showMarkers")),
+								smooth: false,
+								style: strokeStyle,
+								tips: {
+									trackMouse: true,
+									width: 160,
+									renderer: function(storeItem, item) {
+										this.setTitle(clean(item.series.title) + ":<br/>" + displayInformation.times[item.value[0]] + ", " + commaStr(item.value[1]));
+									}
+								}
 
-						});
+							})
+						}else{
+							histograms.push( createHistogramChart(displayInformation, i));
+						}
 					}
 				}
 			}
 		}
-		
-		
-		
 		
 		var axes = [{
 			type: 'Numeric',
@@ -864,6 +880,7 @@ function renderDisplay(display, displayInformation) {
 			},
 			getRange: unfilteredRange
 		}];
+		
 		if (primitives.length > primitives2.length) {
 			axes.push({
 				type: 'Numeric',
@@ -883,6 +900,7 @@ function renderDisplay(display, displayInformation) {
 				getRange: unfilteredRange
 			});
 		}
+		
 		if (primitives2.length > 0) {
 			axes.push({
 				minimum: display.getAttribute("yAxis2Min"),
@@ -904,12 +922,13 @@ function renderDisplay(display, displayInformation) {
 
 
 		chart = Ext.create("Ext.chart.Chart", {
+			flex:1,
 			theme: isTrue(display.getAttribute('showArea'))?themeId:undefined,
 			background: {
 				//color string
 				fill: '#fff'
 			},
-			html: "<div id='scratchpad"+analysisCount+"_"+display.id+"'  style='z-index:1000;position:absolute; width:100%;height:100%;display:none;'></div>",
+			html: "<div id='scratchpad"+analysisCount+"_"+display.id+"' style='z-index:1000;position:absolute; width:100%;height:100%;display:none;'></div>",
 			xtype: 'chart',
 			animate: false,
 			shadow: false,
@@ -934,8 +953,13 @@ function renderDisplay(display, displayInformation) {
 
 			for(var i=0; i< displayInformation.ids.length; i++){
 				if(primitives[j]==displayInformation.ids[i]){
-					displayIds.push("series" + i);
-					displayNames.push(displayInformation.headers[i]);
+					if(displayInformation.renderers[i]){
+
+						displayIds.push("series" + i);
+						displayNames.push(displayInformation.headers[i]);
+					}else{
+						histograms.push(createHistogramChart(displayInformation, i));
+					}
 				}
 			}
 		}
@@ -949,6 +973,7 @@ function renderDisplay(display, displayInformation) {
 		}
 		
 		chart = Ext.create("Ext.chart.Chart", {
+			flex: 1,
 			background: {
 				fill: '#fff'
 			},
@@ -958,7 +983,6 @@ function renderDisplay(display, displayInformation) {
 			shadow: false,
 			store: displayInformation.store,
 			axes: [{
-
 				minimum: display.getAttribute("xAxisMin"),
 				maximum: display.getAttribute("xAxisMax"),
 				type: 'Numeric',
@@ -1117,6 +1141,7 @@ function renderDisplay(display, displayInformation) {
 			background: {
 				fill: '#fff'
 			},
+			flex: 1,
 			legend: {position: seriesBase.length > 4 ? 'right' : 'top'},
 			xtype: 'chart',
 			animate: false,
@@ -1166,10 +1191,18 @@ function renderDisplay(display, displayInformation) {
 	}
 	
 	if (type != "Tabular") {
+		var items = [];
+		if(chart.series.length>0){
+			items.push(chart);
+		}
+		items = items.concat(histograms);
 		var p = {
 			xtype: "panel",
-			items: [chart],
-			layout: "fit",
+			items: items,
+			layout: items.length==1?"fit":{
+		        type: 'vbox',
+		        align: 'stretch'
+		    },
 			dockedItems: [{
 				xtype: 'toolbar',
 				dock: 'bottom',
@@ -1195,6 +1228,7 @@ function renderDisplay(display, displayInformation) {
 
 function createResultsWindow(displayInformation) {
 	displayInformation.maps = [];
+	displayInformation.histograms = [];
 	
 
 	analysisCount++;
@@ -1237,6 +1271,7 @@ function createResultsWindow(displayInformation) {
 
 	scripter.store = displayInformation.store;
 	scripter.maps  = displayInformation.maps;
+	scripter.histograms  = displayInformation.histograms;
 	scripter.updatingSlider = false;
 	scripter.timeIndex = 0;
 	scripter.maxTime = displayInformation.times.length - 1;
@@ -1347,6 +1382,9 @@ function createResultsWindow(displayInformation) {
 		this.maps.forEach(function(x){
 			buildMapStore(x, time);
 		});
+		this.histograms.forEach(function(x){
+			buildHistogramStore(x, time);
+		});
 		//console.log("c");
 		this.updatingSlider = true;
 		this.slider.setValue(time);
@@ -1405,7 +1443,7 @@ function createResultsWindow(displayInformation) {
 			items: [{
 				iconCls: "add-icon",
 				scale: "large",
-				text: 'Add Chart/Table',
+				text: 'Add Display',
 				handler: function() {
 					var parent = graph.getDefaultParent();
 					var win = this.findParentByType("window");
@@ -1427,7 +1465,7 @@ function createResultsWindow(displayInformation) {
 			}, {
 				scale: "large",
 				iconCls: "big-delete-icon",
-				text: 'Delete Chart/Table',
+				text: 'Delete Display',
 				handler: function() {
 
 					var win = this.findParentByType("window");
@@ -1444,6 +1482,59 @@ function createResultsWindow(displayInformation) {
 					} else {
 
 						mxUtils.alert("No chart or table to delete");
+					}
+				}
+			},{
+				scale: "large",
+				iconCls: "leftarrow-icon",
+				text: '',
+				tooltip: "Move display to the left.",
+				handler: function() {
+
+					var win = this.findParentByType("window");
+					if (win.displays.length > 0) {
+						var tabs = win.tabs;
+						var tabIndex = tabs.items.indexOf(tabs.getActiveTab());
+
+						var display = win.displays[tabIndex];
+						graph.orderCells(true, [display]);
+						
+						var child = tabs.getActiveTab();
+						win.displays.splice(tabIndex,1);
+						win.displays = [display].concat(win.displays);
+						
+						tabs.remove(child, false);
+						tabs.insert(0, child);
+						tabs.setActiveTab(child);
+						
+					} else {
+						mxUtils.alert("No chart or table to reorder.");
+					}
+				}
+			},{
+				scale: "large",
+				iconCls: "rightarrow-icon",
+				text: '',
+				tooltip: "Move display to the right.",
+				handler: function() {
+
+					var win = this.findParentByType("window");
+					if (win.displays.length > 0) {
+						var tabs = win.tabs;
+						var tabIndex = tabs.items.indexOf(tabs.getActiveTab());
+
+						var display = win.displays[tabIndex];
+						graph.orderCells(false, [display]);
+						
+						win.displays.splice(tabIndex,1);
+						win.displays.push(display);
+						
+						var child = tabs.getActiveTab();
+						tabs.remove(child, false);
+						tabs.add(child);
+						tabs.setActiveTab(child);
+					} else {
+						mxUtils.alert("No chart or table to reorder.");
 					}
 				}
 			}, '->',{
@@ -1475,7 +1566,7 @@ function createResultsWindow(displayInformation) {
 							return;
 						}
 					}
-					mxUtils.alert("No chart to show scratchpad for.");
+					mxUtils.alert("Scratchpads can only be shown for charts.");
 					
 				}
 			},
@@ -1530,11 +1621,12 @@ function buildMapStore(item, time){
 			//console.log(data[j]);
 			//console.log(data[j].state)
 			if(data[j].state !== null){
-				var states = getName(findID(data[j].state)).join(", ");
+				//console.log(data[j].state)
+				var states = data[j].state.map(function(x){return x.name}).join(", ");
 				//console.log(data[j].connected);
 				for(var k=0; k < data[j].state.length; k++){
 					var x = createDummyBase();
-					var base = "series_"+agent.id+"_"+data[j].state[k]+"_";
+					var base = "series_"+agent.id+"_"+data[j].state[k].id+"_";
 					x[base+"x"] = data[j].location.items[0];
 					x[base+"y"] = data[j].location.items[1];
 					res.push(x);
@@ -1564,7 +1656,113 @@ function buildMapStore(item, time){
 	
 	//console.log(res);
 	item.store.loadData(res);
+}
+
+function buildHistogramStore(item, time){
+	
+	//console.log(res);
+	item.store.loadData(createHistogramData(item.data[time], item.min, item.max));
+	
+}
+//var globalvec;
+function createHistogramChart(displayInformation, i){
+	var store = new Ext.data.JsonStore({
+			fields: [{
+				name: 'Label',
+				type: 'string'
+			}, {
+				name: 'Count',
+				type: 'float'
+			}],
+			data: []
+		});
+		
+	var histogram = {store: store, data: displayInformation.res[displayInformation.ids[i]].results};
+	
+	var vecs = histogram.data;
+	//globalvec=vecs;
+	//console.log("===");
+	//console.log(vecs);
+	//console.log(functionBank["join"](vecs).toNum().items);
+	
+	try{
+		//console.log(functionBank["min"](vecs));
+		//console.log(functionBank["max"](vecs));
+		histogram.min = Math.floor(0+functionBank["min"](vecs).value);
+		histogram.max = Math.ceil(0+functionBank["max"](vecs).value);
+	}catch(err){
+		//console.log("err");
+		histogram.min = -1;
+		histogram.max = 1;
+	}
+	if(isNaN(histogram.min)){
+		histogram.min = -1;
+		histogram.max = 1;
+	}
+
+	if(histogram.min == histogram.max){
+		histogram.min = histogram.min-1;
+		histogram.max = histogram.max+1;
+	}
+	//console.log(histogram);
+	
+    var chart = Ext.create("Ext.chart.Chart", {
+        xtype: 'chart',
+		flex: 1,
+        animate: false,
+        shadow: false,
+        store: store,
+        axes: [{
+            type: 'Category',
+            position: 'bottom',
+            fields: ['Label'],
+			labelTitle: {
+				font: '12px Verdana'
+			},
+			title: displayInformation.headers[i]
+        },
+        {
+            type: 'Numeric',
+            position: 'left',
+            fields: 'Count',
+			decimals: 0,
+            minimum: 0
+        }],
+        series: [{
+	        type: 'column',
+	        xField: 'Label',
+	        yField: "Count",
+			gutter: 5
+	    }]
+    });
 	
 	
+	buildHistogramStore(histogram, displayInformation.scripter.time)
+	displayInformation.histograms.push(histogram)
 	
+	return chart;
+}
+
+function createHistogramData(data, min, max){
+	var divisions = 20;
+	var counts = [];
+	var width = (max-min)/divisions;
+	for(var i = 0; i < divisions; i++){
+		counts.push({Label: round(min+width/2+width*i, 9), Count: 0});
+	}
+	//console.log(data);
+	for(var i = 0; i < data.items.length; i++){
+		//console.log("--")
+		//console.log(min);
+		//console.log(max);
+		var index = 0+data.items[i].value;
+		if(!isNaN(index)){
+			//console.log(index)
+			index = Math.max(0, Math.min(divisions-1, Math.round((index-min)/width-0.5)));
+			//console.log(index);
+			counts[index].Count = counts[index].Count + 1;
+		}
+	}
+	//console.log(counts);
+	return counts;
 }

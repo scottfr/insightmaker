@@ -1958,9 +1958,8 @@ The line color of the primitive
 
 function getLineColor(primitive) {
 	return map(primitive, function(primitive) {
-			return graph.getCellStyle(primitive).strokeColor;
+		return graph.getCellStyle(primitive).strokeColor;
 	});
-	
 }
 
 /*
@@ -1978,14 +1977,14 @@ lineColor - The new line color for the primitive.
 function setLineColor(primitive, lineColor) {
 	
 	map(primitive, function(primitive) {
-			var style = primitive.getStyle();
-			style = mxUtils.setStyle(style, "strokeColor", lineColor);
+		var style = primitive.getStyle();
+		style = mxUtils.setStyle(style, "strokeColor", lineColor);
 			
-			graph.getModel().execute(new mxStyleChange(	graph.getModel(),
-			primitive,
-			style));
+		graph.getModel().execute(new mxStyleChange(	graph.getModel(),
+		primitive,
+		style));
 
-			propogateGhosts(primitive);
+		propogateGhosts(primitive);
 			
 	});
 	
@@ -2008,7 +2007,7 @@ The font color of the primitive
 
 function getFontColor(primitive) {
 	return map(primitive, function(primitive) {
-			return graph.getCellStyle(primitive).fontColor;
+		return graph.getCellStyle(primitive).fontColor;
 	});
 	
 }
@@ -2028,14 +2027,14 @@ fontColor - The new font color for the primitive.
 function setFontColor(primitive, fontColor) {
 	
 	map(primitive, function(primitive) {
-			var style = primitive.getStyle();
-			style = mxUtils.setStyle(style, "fontColor", fontColor);
+		var style = primitive.getStyle();
+		style = mxUtils.setStyle(style, "fontColor", fontColor);
 			
-			graph.getModel().execute(new mxStyleChange(	graph.getModel(),
-			primitive,
-			style));
+		graph.getModel().execute(new mxStyleChange(	graph.getModel(),
+		primitive,
+		style));
 
-			propogateGhosts(primitive);
+		propogateGhosts(primitive);
 			
 	});
 	
@@ -2058,7 +2057,7 @@ The fill color of the primitive
 
 function getFillColor(primitive) {
 	return map(primitive, function(primitive) {
-			return graph.getCellStyle(primitive).fillColor;
+		return graph.getCellStyle(primitive).fillColor;
 	});
 	
 }
@@ -2078,15 +2077,59 @@ fillColor - The new fill color for the primitive.
 function setFillColor(primitive, fillColor) {
 	
 	map(primitive, function(primitive) {
-			var style = primitive.getStyle();
-			style = mxUtils.setStyle(style, "fillColor", fillColor);
+		var style = primitive.getStyle();
+		style = mxUtils.setStyle(style, "fillColor", fillColor);
 			
-			graph.getModel().execute(new mxStyleChange(	graph.getModel(),
-			primitive,
-			style));
+		graph.getModel().execute(new mxStyleChange(	graph.getModel(),
+		primitive,
+		style));
 
-			propogateGhosts(primitive);
+		propogateGhosts(primitive);
 			
+	});
+	
+}
+
+
+/*
+Method: getImage
+
+Gets the image of the passed primitive.
+
+Parameters:
+
+primitive - The primitive for which the image will be returned. May also be an array of primitives.
+
+Return:
+
+The image of the primitive as a string
+
+*/
+
+function getImage(primitive) {
+	return map(primitive, function(primitive) {
+		return primitive.getAttribute("Image");
+	});
+	
+}
+
+/*
+Method: setImage
+
+Sets the image of the passed primitive.
+
+Parameters:
+
+primitive - The primitive for which the image will be set. May also be an array of primitives in which case they will all be set to the same image.
+image - The image url or alias as a string.
+
+*/
+
+function setImage(primitive, image) {
+	
+	map(primitive, function(primitive) {
+		primitive.setAttribute("Image", image);
+		setPicture(primitive);
 	});
 	
 }

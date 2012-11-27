@@ -9,26 +9,17 @@ terms of the Insight Maker Public License (http://insightMaker.com/impl).
 */
 
 // ********** Code for UnitStore **************
-function UnitStore(data) {
-  this.names = new Array();
-  this.exponents = new Array();
-  if (data != null) {
-	  for(var i=0; i<data.length; i++){
-		  this.names.push(data[i].id.toLowerCase());
-		  this.exponents.push(data[i].exponent);
-	  }
-  }
+function UnitStore(names, exponents) {
+  this.names = names?names:[];
+  this.exponents = exponents?exponents:[];
 }
 
 UnitStore.prototype.clone = function() {
-  var us = new UnitStore(null, 1);
-  us.names = this.names.slice(0);
-  us.exponents = this.exponents.slice(0);
-  return us;
+  return new UnitStore(this.names.slice(), this.exponents.slice());
 }
 UnitStore.prototype.multiplyUnitStore = function(rhs, exponent) {
   for (var i = 0; i < rhs.names.length; i++) {
-    var j = indexOf(this.names, rhs.names[i]);
+    var j = this.names.indexOf(rhs.names[i]);
     if (j != -1) {
       this.exponents[j] = this.exponents[j] + rhs.exponents[i] * exponent;
     }
@@ -100,7 +91,7 @@ UnitStore.prototype.toString = function() {
   var n = "", den = "";
   var numItems = 0, denItems = 0;
   for (var i = 0; i < this.names.length; i++) {
-	  if(this.names[i]!=""){
+	  if(this.names[i]!="" && this.names[i]!=""){
 	    var item = null;
 	    item = "<span class=\"unit\">" + toTitleCase(this.names[i]) + "</span>";
 	    if (this.exponents[i] != 1 && this.exponents[i] != -1) {
@@ -130,7 +121,7 @@ UnitStore.prototype.toString = function() {
     return "<div class=\"units\">"+n+"</div>";
   }
   else {
-	  if(n==""){
+	  if(n=="Unitless"){
 		  n = "1";
 	  }
     return "<span class=\"units\">"+ n + "<hr/><span class='markup'>/(</span>" + den + "<span class='markup'>)</span></span>";
@@ -215,18 +206,11 @@ function unitsEqual(lhs, rhs, forceLoose) {
   }
 
   for (var i = 0; i < lhs.names.length; i++) {
-    if (indexOf(rhs.names, lhs.names[i]) == -1 || lhs.exponents[i] != rhs.exponents[indexOf(rhs.names, lhs.names[i])]) {
+    if (rhs.names.indexOf(lhs.names[i]) == -1 || lhs.exponents[i] != rhs.exponents[rhs.names.indexOf(lhs.names[i])]) {
       return false;
     }
   }
   return true;
 }
 
-var indexOf = function(arr, needle){
-	for(var i=0; i<arr.length; i++){
-		if(arr[i]===needle){
-			return i;
-		}
-	}
-	return -1;
-}
+

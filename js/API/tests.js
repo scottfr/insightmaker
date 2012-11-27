@@ -340,6 +340,12 @@ function testAgents(){
 	assertEqual("Pop 11", res.value(v)[0], 1);
 	assertEqual("Pop 12", res.value(v2)[8], 10);
 	
+	setValue(v, "PopulationSize([Population])")
+	setValue(v2, "Count(Value([Population], [Var]))")
+	res = runModel(true);
+	assertEqual("Pop 12.1", res.value(v)[0], res.value(v2)[0]);
+	assertEqual("Pop 12.2", res.value(v)[8], res.value(v2)[8]);
+	
 	setValue(v, "Count(Join(FindState([Population], [State 1]), FindState([Population], [State 2])))");
 	setValue(v2, "Min(Value(Join(FindState([Population], [State 1]), FindState([Population], [State 2])), [Var]))");
 	res = runModel(true);
@@ -551,6 +557,41 @@ function testAgents(){
 			
 	clearModel()
 	
+	var v = createPrimitive("Var", "Variable", [350,350], [200,200]);
+	var v2 = createPrimitive("Var2", "Variable", [0,300], [200,100]);
+	var f = createPrimitive("Agent", "Folder", [300,300], [300,300]);
+	setFolderType(f, "Agent");
+	setParent(v,f);
+	var p = createPrimitive("Population", "Agents", [0,0],[200,100]);
+	var a = createPrimitive("Action", "Action", [300,0],[200,100]);
+	createConnector("Link","Link", f,p);
+	createConnector("Link","Link", p,v);
+	createConnector("Link","Link", p,v2);
+	createConnector("Link","Link", p,a);
+	setAgentBase(p, f)
+	setPopulationSize(p,5)
+	setValue(v, "PopulationSize([Population])")
+	setTriggerType(a, "Condition");
+	setTriggerValue(a, "years=5");
+	setValue(a, "repeat(add([Population]),10)");
+	setValue(v2, "Count(unique(Value([Population],[Var])))")
+	
+	res = runModel(true);
+	assertEqual("Additional Add 1", res.value(v2)[0], 1);
+	assertEqual("Additional Add 2", res.value(v2)[5], 1);
+	assertEqual("Additional Add 3", res.value(v2)[6], 1);
+	assertEqual("Additional Add 4", res.value(v2)[7], 1);
+
+	setValue(v2, "max(Value([Population],[Var]))")
+	res = runModel(true);
+	assertEqual("Additional Add 5", res.value(v2)[0], 5);
+	assertEqual("Additional Add 6", res.value(v2)[5], 5);
+	assertEqual("Additional Add 7", res.value(v2)[6], 15);
+	assertEqual("Additional Add 8", res.value(v2)[7], 15);
+	
+	
+	clearModel();
+	
 	test = prevTest;
 	
 }
@@ -706,6 +747,9 @@ function testPrimitiveGetSet(){
 	assertEqual("Line Color", getLineColor(x), "yellow");
 	setOpacity(x, 50);
 	assertEqual("Opacity", getOpacity(x), 50);
+	
+	setImage(x, "http://testimage.com/image.png");
+	assertEqual("Image", getImage(x), "http://testimage.com/image.png");
 	
 	
 	var f = findName("My Flow");

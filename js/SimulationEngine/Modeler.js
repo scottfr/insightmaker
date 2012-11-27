@@ -64,10 +64,7 @@ function innerRunSimulation(silent) {
 	//Set Up simulation time settings
 		
 	timeUnits = setting.getAttribute("TimeUnits");
-	var u = new UnitStore([{
-		id: timeUnits,
-		exponent: 1
-	}]);
+	var u = new UnitStore([timeUnits],[1]);
 	model["timeStep"] = new Material(sn("#i" + setting.getAttribute("TimeStep")), u.clone());
 	model["timeLength"] = new Material(sn("#i" + setting.getAttribute("TimeLength")), u.clone());
 	model["timeStart"] = new Material(sn("#i" + setting.getAttribute("TimeStart")), u.clone());
@@ -289,10 +286,9 @@ function innerRunSimulation(silent) {
 
 	model["submodels"] = submodels;
 
-
 	if (silent) {
 		var res = simulate(model, true);
-
+		
 		res.error = "none";
 		res.errorPrimitive = null;
 		res.names = {};
@@ -307,7 +303,6 @@ function innerRunSimulation(silent) {
 			return this[item.id].results[this[item.id].results.length - 1];
 		};
 		res.periods = res["Time"].length;
-
 
 		return res;
 	} else {
@@ -328,14 +323,9 @@ function innerRunSimulation(silent) {
 
 function createUnitStore(u) {
 	if (u.toLowerCase() == "unitless") {
-		return new UnitStore([{
-			id: "",
-			exponent: 1
-		}]);
+		return new UnitStore([""],[1]);
 	}
-
-	var x = simpleEquation("{1 " + u + "}");
-	return x.units;
+	return simpleEquation("{1 " + u + "}").units;
 }
 
 function simpleEquation(eq, scope, primitiveBank, tree){
@@ -361,11 +351,9 @@ function simpleNum(mat, units){
 		}));
 	}
 	
-	
 	if(unitless(units) && (! unitless(mat.units))){
 		throw("The result of the calculation has units "+mat.units.toString()+", but the no units are specified for the calculation. Please set the units for the calculation so we can determine the proper output.");
 	}
-
 	
 	if( unitless(mat.units) ){
 		return 0+mat.value;
@@ -434,7 +422,7 @@ function tally(arr) {
 function aggregateAgentSeries(res){
 	var data = res.results.map(function(x){
 		var states = [];
-		x.current.forEach(function(x){states = states.concat(x.state)})
+		x.current.forEach(function(x){states = states.concat(x.state.map(function(x){return x.id.toString()}))})
 		
 		var items = tally(states);
 		res.data.states.forEach(function(key){
@@ -465,6 +453,7 @@ function finishSim(res, displayInformation) {
 	var displayedIds = [];
 	var displayedHeaders = []
 	var colors = [];
+	var renderers = [];
 	
 	
 	for(var i = 0; i < displayInformation.ids.length; i++){
@@ -476,21 +465,34 @@ function finishSim(res, displayInformation) {
 		
 		if(item.value.nodeName == "Agents"){
 			var x = aggregateAgentSeries(res[id]);
+			//console.log(x)
 			agents[id.toString()] = {id: id, item: item, data: res[id].data, results: res[id].results, aggregate: x};
 			
 			for(var key in x){
 				var innerItem = findID(key);
 				ids.push(id);
 				headers.push(getName(innerItem));
-				colors.push(getLineColor(innerItem))
+				colors.push(getLineColor(innerItem));
 				agentKeys.push(key);
+				if(res[id].dataMode == "float"){
+					renderers.push(commaStr);
+				}else{
+					renderers.push(undefined);
+				}
 			}
 		}else{
 			ids.push(id)
 			headers.push(getName(item));
 			colors.push(getLineColor(item));
 			agentKeys.push(false);
+			if(res[id].dataMode == "float"){
+				renderers.push(commaStr);
+			}else{
+				renderers.push(undefined);
+			}
 		}
+		
+		
 	}
 	
 	displayInformation.colors = colors;
@@ -499,6 +501,8 @@ function finishSim(res, displayInformation) {
 	displayInformation.agents = agents;
 	displayInformation.displayedHeaders = displayedHeaders;
 	displayInformation.displayedIds = displayedIds;
+	displayInformation.renderers = renderers;
+	displayInformation.res = res;
 	
 	displayInformation.times = res["Time"];
 	var storeData = [];
@@ -527,7 +531,7 @@ function finishSim(res, displayInformation) {
 	for (var i = 0; i < headers.length; i++) {
 		var n = "series" + i;
 		storeFields.push({
-			type: "float",
+			type: res[ids[i]].dataMode,
 			name: n
 		});
 	}
@@ -616,10 +620,7 @@ function getDNA(cell){
 			try {
 				dna.delay = evaluateTree(trimTree(createTree(cell.getAttribute("Delay")), {}));
 				if (dna.delay.units.unitless()) {
-					dna.delay.units = new UnitStore([{
-						id: timeUnits,
-						exponent: 1
-					}]);
+					dna.delay.units = new UnitStore([timeUnits], [1]);
 				}
 			} catch (err) {
 				if (isLocal()) {
@@ -643,10 +644,7 @@ function getDNA(cell){
 		var out = [];
 		var myU;
 		if (dna.source == "Time") {
-			myU = new UnitStore([{
-				id: timeUnits,
-				exponent: 1
-			}]);
+			myU = new UnitStore([timeUnits],[1]);
 		} else {
 			myU = createUnitStore(orig(findID(dna.source)).getAttribute("Units"));
 		}
@@ -666,10 +664,7 @@ function getDNA(cell){
 				if (type != "Flow" || u.toLowerCase() != "unitless") {
 					dna.units = createUnitStore(u);
 				} else {
-					dna.units = new UnitStore([{
-						id: timeUnits,
-						exponent: -1
-					}]);
+					dna.units = new UnitStore([timeUnits],[-1]);
 					dna.flowUnitless = true;
 				}
 			} catch (err) {
@@ -685,10 +680,7 @@ function getDNA(cell){
 			}
 		} else {
 			if (dna.trigger == "Timeout") {
-				dna.units = new UnitStore([{
-					id: timeUnits,
-					exponent: 1
-				}]);
+				dna.units = new UnitStore([timeUnits],[1]);
 			} 
 		}
 		dna.maxConstraint = cell.getAttribute("MaxConstraint");
@@ -717,7 +709,7 @@ function decodeDNA(dna, agent){
 		x = new Stock();
 		x.nonNegative = dna.nonNegative;
 		if (dna.stockType == "Conveyor") {
-			x.delay = dna.delay.clone();
+			x.delay = dna.delay;
 		}
 	} else if (type == "Flow") {
 		x = new Flow();
@@ -811,19 +803,6 @@ function linkPrimitive(primitive, dna){
 
 function setAgentInitialValues(agent){
 	for(var i = 0; i < agent.children.length; i++){
-		if(timeIndex > 0){
-			var maxI = timeIndex + 1;
-			if((agent.children[i] instanceof Stock) || (agent.children[i] instanceof State)){
-				maxI = maxI-2;
-			}
-			for(var j = 0; j < maxI; j++){
-				agent.children[i].pastValues.push(zero.clone());
-			}
-			if((agent.children[i] instanceof Stock) || (agent.children[i] instanceof State)){
-				agent.children[i].value();
-				agent.children[i].pastValues.push(agent.children[i].pastValues[agent.children[i].pastValues.length-1]);
-			}
-		}
 		if(agent.children[i] instanceof Stock){
 			agent.children[i].setDelay();
 			try{
@@ -855,6 +834,7 @@ function setAgentInitialValues(agent){
 			}
 		}
 	}
+	
 }
 
 function buildNetwork(submodel){
@@ -998,27 +978,15 @@ function getPrimitiveNeighborhood(primitive, dna){
 	
 	if(dna.type=="Agents"){
 		for(var i=0; i<primitive.DNA.length; i++){
-			var p = new Primitive();
-			p.name = primitive.DNA[i].name;
-			p.id = primitive.DNA[i].id;
-			p.calculateValue = function(){
-				error("["+this.name+"] is a placeholder and cannot be used as a direct value in equations.", primitive, true);
-			}
-			hood[primitive.DNA[i].name.toLowerCase()] = p;
+			hood[primitive.DNA[i].name.toLowerCase()] = new Placeholder(primitive.DNA[i].name, primitive.DNA[i].id, primitive);
 		}
 	}
-	neighbors.forEach(function(neighbor) {
-		var item = neighbor.item;
+	for(var k=0; k<neighbors.length; k++){
+		var item = neighbors[k].item;
 		if(item.value.nodeName == "Agents"){
 			hood[submodels[item.id].name.toLowerCase()] = submodels[item.id];
-			for(var i=0; i<submodels[item.id].DNA.length; i++){
-				var p = new Primitive();
-				p.name = submodels[item.id].DNA[i].name;
-				p.id = submodels[item.id].DNA[i].id;
-				p.calculateValue = function(){
-					error("["+this.name+"] is a placeholder and cannot be used as a direct value in equations.", primitive, true);
-				}
-				hood[submodels[item.id].DNA[i].name.toLowerCase()] = p;
+			for(var i = 0; i < submodels[item.id].DNA.length; i++){
+				hood[submodels[item.id].DNA[i].name.toLowerCase()] = new Placeholder(submodels[item.id].DNA[i].name, submodels[item.id].DNA[i].id, primitive);
 			}
 		}else{
 
@@ -1043,7 +1011,7 @@ function getPrimitiveNeighborhood(primitive, dna){
 				}
 			}
 		}
-	});
+	}
 	
 	//console.log(hood);
 	

@@ -48,7 +48,7 @@ function setTopLinks() {
 		arrow = "&darr;"
 	}
     if (drupal_node_ID == -1) {
-        links = '<div style="float:right;padding:0.2em;"><nobr><a href="'+base_path+'/help" target="_blank" >Help</a> | <a href="'+base_path+'/directory" target="_blank">Find More Insights</a> | <a href="javascript:toggleTopBar()"  id="toolbarToggle">'+arrow+'</a></nobr></div>';
+        links = '<div style="float:right;padding:0.2em;"><nobr><a href="'+base_path+'/help" target="_blank" >Help</a> | <a href="'+base_path+'/browse" target="_blank">Find More Insights</a> | <a href="javascript:toggleTopBar()"  id="toolbarToggle">'+arrow+'</a></nobr></div>';
     } else {
         if (is_editor) {
             links = '<div style="float:left;padding:0.2em;">';

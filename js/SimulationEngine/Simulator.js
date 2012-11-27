@@ -60,7 +60,7 @@ var simulate = function(model, silent, callback){
 				data.units = item.geoDimUnitsObject;
 				data.states = item.states();
 			}
-			simulate.results[item.id] = {data: data, results: []};
+			simulate.results[item.id] = {data: data, results: [], dataMode: "float"};
 		}
 		
 		fillDataSeries(simulate);
@@ -305,7 +305,8 @@ var simulate = function(model, silent, callback){
 				//console.log("V: "+v.value().value.toString())
 				
 				if(x instanceof Vector){
-					item.results[v.id].results.push(NaN);
+					item.results[v.id].results.push(x);
+					item.results[v.id].dataMode = "auto";
 				}else{
 					//console.log(x);
 					if(item.displayed[i].unitless && (! unitless(x.units))){
@@ -330,7 +331,6 @@ var simulate = function(model, silent, callback){
 			}
 		}
 	}
-	
 	
 	if(silent){
 		return simulate.results;

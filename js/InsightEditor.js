@@ -394,9 +394,6 @@ function main() {
 		items: [mxPanel]
 	});
 	
-	
-
-
 	mainPanel.on('resize', function() {
 		graph.sizeDidChange();
 	});
@@ -433,11 +430,7 @@ function main() {
 		});
 	}
 
-
-
 	graph.model.styleForCellChanged = function(cell, style) {
-		//console.log(cell);
-		//console.log(style);
 		var x = mxGraphModel.prototype.styleForCellChanged(cell, style);
 		propogateGhosts(cell);
 		return x;
@@ -1478,13 +1471,28 @@ function main() {
 			} else {
 
 				var topDesc = clean(graph_description);
+				var topTags = "";
 				if (topDesc == "") {
 					if (is_editor) {
 						topDesc = "<span style='color: gray'>You haven't entered a description for this Insight yet. Please enter one to help others understand it.</span>";
 					}
 				}
+				
+				if(graph_tags.trim() != ""){
+					graph_tags.split(",").forEach(function(tag){
+						var t = tag.trim();
+						topTags = topTags+"<a target='_blank' href='http://insightmaker.com/tag/"+clean(t.replace(/ /g, "-"))+"'>"+clean(t)+"</a> ";	
+					});
+				}
 
 				topDesc = "<big>" + topDesc + "</big><br/><br/>";
+				
+				if(topTags != ""){
+					topDesc = topDesc + "Tags: "+topTags+"<br/><br/>";
+				}
+				if((! is_editor) && graph_author_name != ""){
+					topDesc = topDesc + "Author: <a target='_blank' href='http://insightmaker.com/user/"+clean(graph_author_id)+"'>"+clean(graph_author_name)+"</a><br/><br/>";
+				}
 				
 				if (slids.length > 0) {
 					var sliderHolder = Ext.create("Ext.container.Container", {
@@ -2092,11 +2100,13 @@ var makeGhost = function() {
 		graph.getModel().endUpdate();
 
 	};
+	
 var makeFolder = function() {
-		var group = graph.groupCells(null, 20);
-		graph.setSelectionCell(group);
-		graph.orderCells(true);
-	};
+	var group = graph.groupCells(null, 20);
+	group.setConnectable(true);
+	graph.setSelectionCell(group);
+	graph.orderCells(true);
+};
 
 
 

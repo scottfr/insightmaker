@@ -27,19 +27,19 @@ var primitiveBank = {};
 
 
 varBank["-parent"] = null;
-varBank["e"] = new Material(2.71828182845904523536, new UnitStore());
-varBank["pi"] = new Material(3.14159265358979323846264338, new UnitStore());
-varBank["phi"] = new Material(1.61803399, new UnitStore());
+varBank["e"] = new Material(2.71828182845904523536);
+varBank["pi"] = new Material(3.14159265358979323846264338);
+varBank["phi"] = new Material(1.61803399);
 
 
 if(! Primitive){
 	var Primitive = function(){
 		this.v = new Material(0);
 		this.value = function(){
-			return this.v.clone();
+			return this.v.fullClone();
 		};
 		this.setValue = function(newValue){
-			this.v = newValue.clone()
+			this.v = newValue;
 		};
 	}
 	primitiveBank["test"] = new Primitive();
@@ -125,7 +125,11 @@ Vector.prototype.apply = function(operation){
 Vector.prototype.clone = function(){
 	var newItems = [];
 	for(var i=0; i<this.items.length; i++){
-		newItems.push(this.items[i].clone());
+		if(this.items[i] instanceof Material){
+			newItems.push(this.items[i]);
+		}else{
+			newItems.push(this.items[i].clone());
+		}
 	}
 	return new Vector(newItems);
 };
@@ -192,8 +196,8 @@ function evaluate(input) {
 			var newBank = {};
 			newBank["-parent"] = varBank;
  			for(var i = -100; i <= 100; i += 1){
-				newBank["x"] = new Material(i/10, new UnitStore());
-				res.data.push([i/10, parseFloat(evaluateTree(root, newBank).value.toPrecision(21))]);
+				newBank["x"] = new Material(i/10);
+				res.data.push([i/10, 0+evaluateTree(root, newBank).value]);
  			}
 			
 			return res;
@@ -230,21 +234,20 @@ function evaluate(input) {
 	return x;
 }
 
-var TreeNode = function(text, type, typeName){
+var TreeNode = function(text, typeName){
 	this.origText = text;
 	this.text = text.toLowerCase();
-	this.type = type;
 	this.typeName = typeName;
 	this.children = [];
 };
 
 function convertToObject(node, parser) {
-	var current = new TreeNode( node.getToken().getText(), node.getToken().getType(), parser.getTokenNames()[node.getToken().getType()]);
+	var current = new TreeNode( node.getToken().getText(), parser.getTokenNames()[node.getToken().getType()]);
 
 	//Add children
 	if (node.getChildCount() > 0) {
 		var children = node.getChildren();
-		for (var i in children) {
+		for (var i=0; i<children.length; i++) {
 			current.children.push(convertToObject(children[i], parser));
 		}
 	}
@@ -260,16 +263,15 @@ funcEvalMap["LINES"] = function(node, scope) {
 	if(node.children.length==0){
 		return new Material(0);
 	}
-	var responses = [];
+	var response;
 	for(var i=0; i<node.children.length; i++){
-		responses.push( evaluateNode(node.children[i], scope) );
+		response =  evaluateNode(node.children[i], scope);
 	}
-	return responses[responses.length-1];
+	return response;
 };
 
 funcEvalMap["NEGATE"] = function(node, scope) {
-	var x = evaluateNode(node.children[0], scope).toNum();
-	return negate(x);
+	return negate(evaluateNode(node.children[0], scope).toNum());
 };
 function negate(x){
 	if(x instanceof Vector){
@@ -280,11 +282,7 @@ function negate(x){
 }
 
 funcEvalMap["AND"] = function(node, scope) {
-
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-	
-	return funAnd(lhs,rhs)
+	return funAnd(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum())
 };
 
 function funAnd(lhs,rhs){
@@ -298,11 +296,7 @@ function funAnd(lhs,rhs){
 }
 
 funcEvalMap["OR"] = function(node, scope) {
-
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-	
-	return funOr(lhs,rhs)
+	return funOr(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum())
 };
 
 function funOr(lhs,rhs){
@@ -317,23 +311,19 @@ function funOr(lhs,rhs){
 
 
 funcEvalMap["NOT"] = function(node, scope) {
-	var item = evaluateNode(node.children[0], scope).toNum();
-	return fNot(item);
+	return fNot(evaluateNode(node.children[0], scope).toNum());
 };
 
 function fNot(x){
 	if(x instanceof Vector){
-		return x.apply( fNot);
+		return x.apply(fNot);
 	}
 	
 	return ! trueValue(x);
 }
 
 funcEvalMap["NOTEQUALS"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-	
-	return neq(lhs,rhs);
+	return neq(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 
 function neq(lhs, rhs){
@@ -353,7 +343,7 @@ function neq(lhs, rhs){
 			return true;
 		} else {
 			rhs.value = fn["*"](rhs.value, scale);
-			rhs.units = lhs.units;
+			rhs.units = lhs.units.clone();
 		}
 	}
 
@@ -361,11 +351,7 @@ function neq(lhs, rhs){
 }
 
 funcEvalMap["EQUALS"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-
-	
-	return eq(lhs, rhs);
+	return eq(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 
 function eq(lhs, rhs){
@@ -393,10 +379,7 @@ function eq(lhs, rhs){
 }
 
 funcEvalMap["LT"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-
-	return lessThan(lhs, rhs);
+	return lessThan(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 function lessThan(lhs, rhs){
 	if(lhs instanceof Vector){
@@ -420,10 +403,7 @@ function lessThan(lhs, rhs){
 }
 
 funcEvalMap["LTEQ"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-
-	return lessThanEq(lhs, rhs);
+	return lessThanEq(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 function lessThanEq(lhs, rhs){
 	
@@ -447,10 +427,7 @@ function lessThanEq(lhs, rhs){
 }
 
 funcEvalMap["GT"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-
-	return greaterThan(lhs, rhs);
+	return greaterThan(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 
 function greaterThan(lhs, rhs){
@@ -475,10 +452,7 @@ function greaterThan(lhs, rhs){
 }
 
 funcEvalMap["GTEQ"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-
-	return greaterThanEq(lhs, rhs);
+	return greaterThanEq(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 
 function greaterThanEq(lhs, rhs){
@@ -495,7 +469,6 @@ function greaterThanEq(lhs, rhs){
 			unitAlert(lhs.units, rhs.units, "comparison");
 		} else {
 			rhs.value = fn["*"](rhs.value, scale);
-			rhs.units = lhs.units.clone();
 		}
 	}
 
@@ -503,10 +476,7 @@ function greaterThanEq(lhs, rhs){
 }
 
 funcEvalMap["PLUS"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-
-	return plus(lhs, rhs);
+	return plus(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 
 function plus(lhs, rhs){
@@ -526,15 +496,12 @@ function plus(lhs, rhs){
 		}
 	}
 
-	return new Material(fn["+"](lhs.value, rhs.value), selectUnits(rhs.units, lhs.units));
+	return new Material(fn["+"](lhs.value, rhs.value), rhs.units.clone());
 
 }
 
 funcEvalMap["MINUS"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-
-	return minus(lhs, rhs);
+	return minus(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 
 function minus(lhs, rhs){
@@ -545,7 +512,7 @@ function minus(lhs, rhs){
 		return rhs.combine(lhs, minus, true);
 	}
 	
-	if (!unitsEqual(lhs.units, rhs.units)) {
+	if (! unitsEqual(lhs.units, rhs.units)) {
 		var scale = convertUnits(rhs.units, lhs.units);
 		if (scale == 0) {
 			unitAlert(lhs.units, rhs.units, "subtraction");
@@ -555,13 +522,11 @@ function minus(lhs, rhs){
 		}
 	}
 
-	return new Material(fn["-"](lhs.value, rhs.value), selectUnits(rhs.units, lhs.units));
+	return new Material(fn["-"](lhs.value, rhs.value), rhs.units.clone());
 }
 
 funcEvalMap["MULT"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-	return mult(lhs, rhs);
+	return mult(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 
 function mult(lhs, rhs){
@@ -571,18 +536,14 @@ function mult(lhs, rhs){
 		return rhs.combine(lhs, mult, true);
 	}
 	
-	var u = lhs.units.clone();
-	u.multiplyUnitStore(rhs.units, 1);
-	var x = new Material(fn["*"](lhs.value, rhs.value), u);
+	var x = new Material(fn["*"](lhs.value, rhs.value), lhs.units.clone());
+	x.units.multiplyUnitStore(rhs.units, 1);
 	x.simplify();
 	return x;
 }
 
 funcEvalMap["DIV"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-	
-	return div(lhs, rhs);
+	return div(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 
 function div(lhs, rhs){
@@ -592,9 +553,8 @@ function div(lhs, rhs){
 		return rhs.combine(lhs, div, true);
 	}
 	
-	var u = lhs.units.clone();
-	u.multiplyUnitStore(rhs.units, -1);
-	var x = new Material(fn["/"](lhs.value, rhs.value), u);
+	var x = new Material(fn["/"](lhs.value, rhs.value), lhs.units.clone());
+	x.units.multiplyUnitStore(rhs.units, -1);
 	x.simplify();
 	return x;
 }
@@ -637,10 +597,7 @@ function power(lhs, rhs){
 }
 
 funcEvalMap["MOD"] = function(node, scope) {
-	var lhs = evaluateNode(node.children[0], scope).toNum();
-	var rhs = evaluateNode(node.children[1], scope).toNum();
-	
-	return doMod(lhs, rhs);
+	return doMod(evaluateNode(node.children[0], scope).toNum(), evaluateNode(node.children[1], scope).toNum());
 };
 
 function doMod(lhs, rhs){
@@ -662,10 +619,10 @@ funcEvalMap["IDENT"] = function(node, scope) {
 	var varName = node.text;
 	
 	while ( !(varName in scope) ) {
-		if ( scope["-parent"] != null ) {
+		if ( scope["-parent"] ) {
 			scope = scope["-parent"];
 		} else {
-			//Attempt to use the variable as a funciton call
+			//Attempt to use the variable as a function call
 			if(varName in functionBank){
 				if ("fn" in functionBank[varName]) {
 					return functionBank[varName].fn([]) // user defined function
@@ -676,7 +633,7 @@ funcEvalMap["IDENT"] = function(node, scope) {
 			if(varName == "x"){
 				throw "PLOT" ;
 			}else if(varName=="i"){//imaginary number
-				return new Material(sn("i"), new UnitStore());
+				return new Material(sn("i"));
 			}else{
 				throw "MSG: The variable \"" + node.origText + "\" does not exist.";
 			}
@@ -878,12 +835,6 @@ function functionGenerator(varName, paramNames, paramDefaults, code){
 	functionBank[varName] = makeFunctionCall(varName, varNames, varDefaults, code);
 }
 
-funcEvalMap["MATERIAL"] = function(node, scope) {
-	var units = node.children[0];
-	var x = evaluateNode(node.children[1], scope);
-	return (new Material(x.value, new UnitStore(evaluateUnits(units))));
-};
-
 var unitEvalMap = new Object();
 unitEvalMap["MULT"] = function(node) {
 	return evaluateUnits(node.children[0]).concat(evaluateUnits(node.children[1]));
@@ -961,19 +912,11 @@ function evaluateNode(node, scope) {
 	if(node instanceof TreeNode){
 		return funcEvalMap[node.typeName](node, scope);
 	}else if(node instanceof PrimitiveStore){
-		if(node.type == "value"){
-			//console.log("Value")
-			return node.primitive.value().clone();
-		}else if(node.type == "totalValue"){
+		if(node.type == "totalValue"){
 			return node.primitive.totalContents();
 		}else if(node.type == "object"){
-			//console.log("object");
-			//console.log(node.primitive);
 			return node.primitive;
 		}
-		//return new Material(node.value(), node.units.clone());
-	}else if(node instanceof Material){
-		return node.clone();
 	}else{
 		return node;
 	}
@@ -985,13 +928,12 @@ trimEvalMap["POWER"] = function(node, primitives) {
 	if(node.children.length == 1){
 		return trimNode(node.children[0], primitives);
 	}else{
-		var n = new TreeNode(node.origText, node.type, node.typeName);
+		var n = new TreeNode(node.origText, node.typeName);
 		for(var i = 0; i < node.children.length; i++){
 			n.children.push(trimNode(node.children[i], primitives));
 		}
 		return n;
 	}
-	
 };
 trimEvalMap["TRUE"] = function(node) {
 	return true;
@@ -1002,6 +944,62 @@ trimEvalMap["FALSE"] = function(node) {
 trimEvalMap["INTEGER"] = function(node) {
 	return new Material(sn("#e"+node.text));
 };
+trimEvalMap["MATERIAL"] = function(node, scope) {
+	var units = node.children[0];
+	var x = trimNode(node.children[1], scope);
+	var units = evaluateUnits(units);
+	var exponents = [], names = [];
+	for(var i=0; i<units.length; i++){
+		exponents.push(units[i].exponent);
+		names.push(units[i].id);
+	}
+	return new Material(x.value, new UnitStore(names, exponents));
+};
+trimEvalMap["MULT"] = function(node, scope) {
+	var lhs = trimNode(node.children[0], scope);
+	var rhs = trimNode(node.children[1], scope);
+	if((lhs instanceof Material) && (rhs instanceof Material)){
+		return mult(lhs, rhs);
+	}else{
+		var n = new TreeNode(node.origText, node.typeName);
+		n.children = [lhs,rhs]
+		return n;
+	}
+};
+trimEvalMap["DIV"] = function(node, scope) {
+	var lhs = trimNode(node.children[0], scope);
+	var rhs = trimNode(node.children[1], scope);
+	if((lhs instanceof Material) && (rhs instanceof Material)){
+		return div(lhs, rhs);
+	}else{
+		var n = new TreeNode(node.origText, node.typeName);
+		n.children = [lhs,rhs]
+		return n;
+	}
+};
+trimEvalMap["PLUS"] = function(node, scope) {
+	var lhs = trimNode(node.children[0], scope);
+	var rhs = trimNode(node.children[1], scope);
+	if((lhs instanceof Material) && (rhs instanceof Material)){
+		return plus(lhs, rhs);
+	}else{
+		var n = new TreeNode(node.origText,  node.typeName);
+		n.children = [lhs,rhs]
+		return n;
+	}
+};
+trimEvalMap["MINUS"] = function(node, scope) {
+	var lhs = trimNode(node.children[0], scope);
+	var rhs = trimNode(node.children[1], scope);
+	if((lhs instanceof Material) && (rhs instanceof Material)){
+		return minus(lhs, rhs);
+	}else{
+		var n = new TreeNode(node.origText, node.typeName);
+		n.children = [lhs,rhs]
+		return n;
+	}
+};
+
 trimEvalMap["FLOAT"] = trimEvalMap["INTEGER"];
 trimEvalMap["PRIMITIVE"] = function(node, primitiveBank) {
 	var res;
@@ -1015,13 +1013,26 @@ trimEvalMap["PRIMITIVE"] = function(node, primitiveBank) {
 	}
 	return res;
 };
+trimEvalMap["NEGATE"] = function(node, scope) {
+	if(node.children.length==0){
+		return new TreeNode(node.origText,  node.typeName);
+	}
+	var x = trimNode(node.children[0], scope);
+	if(x instanceof Material){
+		return negate(x)
+	}else{
+		var n = new TreeNode(node.origText, node.typeName);
+		n.children = [x]
+		return n;
+	}
+};
 
 
 function trimNode(node, primitives) {
 	if(trimEvalMap.hasOwnProperty(node.typeName)){
 		return trimEvalMap[node.typeName](node, primitives);
 	}else{
-		var n = new TreeNode(node.origText, node.type, node.typeName);
+		var n = new TreeNode(node.origText, node.typeName);
 		for(var i = 0; i < node.children.length; i++){
 			n.children.push(trimNode(node.children[i], primitives));
 		}

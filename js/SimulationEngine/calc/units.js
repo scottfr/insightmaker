@@ -84,12 +84,13 @@ Material.prototype.toString = function(){
 	}
 }
 
-Material.prototype.clone = function(){
-	return new Material( this.value, this.units.clone());
+
+Material.prototype.fullClone = function(){
+	return new Material(this.value, this.units.clone());
 }
 
 Material.prototype.forceUnits = function(newUnits){
-	var newM = this.clone();
+	var newM = this;
 	if(unitless(this.units)){
 		newM.units = newUnits.clone();
 		return newM;
@@ -109,22 +110,6 @@ function unitAlert(lhs, rhs, type){
 	throw "MSG: Invalid units for the "+type+" of "+lhs.toString()+" and "+rhs.toString()+".";
 }
 
-function selectUnits(u1, u2){
-  if( unitless(u1) ){
-    if( u2 != null ){
-      return u2.clone();
-    }else{
-      return null;
-    }
-  }else{
-    return u1.clone();
-  }
-}
-
 function unitless(u){
-	return isNull(u) || u.unitless();
-}
-
-function isNull(o){
-	return null === o;
+	return u === null || u.unitless();
 }
