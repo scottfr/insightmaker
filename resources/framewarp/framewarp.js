@@ -105,7 +105,7 @@
 						'src' : settings.url,
 						'css' : {
 							'width' : settings.width,
-							'height' : settings.height,
+							'height' : settings.height
 						}
 					});
 

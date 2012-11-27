@@ -394,6 +394,13 @@ html, body {
 .replace-icon {
     background-image:url(../images/replace.png) !important;
 }
+.leftarrow-icon {
+    background-image:url(../images/leftarrow.png) !important;
+}
+.rightarrow-icon {
+    background-image:url(../images/rightarrow.png) !important;
+}
+
 
 
 
