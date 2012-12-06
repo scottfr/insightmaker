@@ -92,7 +92,8 @@ div.mxRubberband {
   z-index:  20001;
   height:   auto;
   margin:   0px 0 0 -250px;
-  width: 500px;
+  width: 550px;
+  color: #555;
 }
 
 #loading .loading-indicator {
@@ -454,7 +455,7 @@ bottom: 0;
 right: 0;
 }
 .logo-icon {
-    background-image: url(/builder/images/logo.png);
+    background-image: url(http://insightmaker.com/builder/images/logo.png);
 }
 
 
@@ -477,4 +478,20 @@ right: 0;
             border-radius: 2px;
 			padding:3px;
 	
+}
+
+.x-tip-body ul li {
+	list-style: disc inside none;
+}
+
+.x-tip-body ol li{
+	list-style: decimal inside none;
+}
+
+.description ul li {
+	list-style: disc inside none;
+}
+
+.description ol li{
+	list-style: decimal inside none;
 }

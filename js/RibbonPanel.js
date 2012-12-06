@@ -1032,7 +1032,7 @@ var RibbonPanel = function(graph, history, mainPanel, configPanel) {
 					id: 'scratchpadLarge',
 					text: 'Scratchpad',
 					iconCls: 'scratchpad-large-icon',
-					tooltip: 'Draw notes on your diagram ' + cmd("K"),
+					tooltip: 'Draw a sketch on your diagram ' + cmd("K"),
 					enableToggle: true,
 					scale: 'large',
 					cls: 'button',

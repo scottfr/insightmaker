@@ -190,6 +190,10 @@ function innerRunSimulation(silent) {
 	timeIndex = 0;
 	RKOrder = model.RKOrder;
 	RKPosition = 1;
+	PreviousRandLists = [];
+	RandLoc = -1;
+	lastRandPos = -1;
+	
  	timeIndex = Math.round((time.value - timeStart.value) / timeStep.value);
 	if (RKOrder == 4) {
 		timeStep = div(timeStep, new Material(2));

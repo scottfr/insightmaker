@@ -16,19 +16,19 @@ defineFunction("Stop", {params:[]}, function(x) {
 });
 
 defineFunction("Time", {params:[]}, function(x) {
-	return time;
+	return time.fullClone();
 });
 
 defineFunction("TimeStep", {params:[]}, function(x) {
-	return timeStep;
+	return timeStep.fullClone();
 });
 
 defineFunction("TimeLength", {params:[]}, function(x) {
-	return timeLength;
+	return timeLength.fullClone();
 });
 
 defineFunction("TimeStart", {params:[]}, function(x) {
-	return timeStart;
+	return timeStart.fullClone();
 });
 
 defineFunction("TimeEnd", {params:[]}, function(x) {
@@ -38,7 +38,7 @@ defineFunction("TimeEnd", {params:[]}, function(x) {
 defineFunction("Seconds", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
 	var item;
 	if (x.length == 0) {
-		item = time;
+		item = time.fullClone();
 	} else {
 		item = x[0].toNum();
 	}
@@ -48,7 +48,7 @@ defineFunction("Seconds", { params:[{name: "Value", defaultVal: "time", noVector
 defineFunction("Minutes", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
 	var item;
 	if (x.length == 0) {
-		item = time;
+		item = time.fullClone();
 	} else {
 		item = x[0].toNum();
 	}
@@ -58,7 +58,7 @@ defineFunction("Minutes", { params:[{name: "Value", defaultVal: "time", noVector
 defineFunction("Hours", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
 	var item;
 	if (x.length == 0) {
-		item = time;
+		item = time.fullClone();
 	} else {
 		item = x[0].toNum();
 	}
@@ -68,7 +68,7 @@ defineFunction("Hours", { params:[{name: "Value", defaultVal: "time", noVector: 
 defineFunction("Days", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
 	var item;
 	if (x.length == 0) {
-		item = time;
+		item = time.fullClone();
 	} else {
 		item = x[0].toNum();
 	}
@@ -78,7 +78,7 @@ defineFunction("Days", { params:[{name: "Value", defaultVal: "time", noVector: t
 defineFunction("Weeks", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
 	var item;
 	if (x.length == 0) {
-		item = time;
+		item = time.fullClone();
 	} else {
 		item = x[0].toNum();
 	}
@@ -88,7 +88,7 @@ defineFunction("Weeks", { params:[{name: "Value", defaultVal: "time", noVector: 
 defineFunction("Months", { params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
 	var item;
 	if (x.length == 0) {
-		item = time;
+		item = time.fullClone();
 	} else {
 		item = x[0].toNum();
 	}
@@ -98,7 +98,7 @@ defineFunction("Months", { params:[{name: "Value", defaultVal: "time", noVector:
 defineFunction("Years", {params:[{name: "Value", defaultVal: "time", noVector: true}]}, function(x) {
 	var item;
 	if (x.length == 0) {
-		item = time;
+		item = time.fullClone();
 	} else {
 		item = x[0].toNum();
 	}
@@ -707,7 +707,7 @@ defineFunction("Unconnect", {params: [{needAgent: true, name: "[Agent 1]"}, {nam
 });
 
 defineFunction("Connected", {params: [{needAgent: true, name: "[Agent]"}]}, function(x) {
-	return new Vector(x[0].connected);
+	return new Vector(x[0].connected.slice());
 });
 
 functionBank["die"] = function(x) {

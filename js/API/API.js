@@ -226,7 +226,7 @@ Tab Objects:
 Each tab object contains several properties.
 
 name - The name of the tab
-type - The tab type. E.g. "text", "table" or "chart"
+type - The tab type. E.g. "text", "HTML", "table" or "chart"
 data - The data for the tab
 
 The different types of tabs are as follows.
@@ -234,6 +234,10 @@ The different types of tabs are as follows.
 Text Tab:
 
 A text tab displays a large amount of text. For a text tab, the data property should be the text string that will be displayed.
+
+HTML Tab:
+
+An HTML tab displays HTML content. For an HTML tab, the data property should be the HTML content that will be displayed.
 
 Table Tab:
 
@@ -296,6 +300,10 @@ Example:
 >	type: "text",
 >	data: "This is a long data string..."
 >	},
+>  {name: "I'm an HTML Tab",
+>	type: "html",
+>	data: "<center><p>This is <b>HTML</b> content.</p></center>"
+>	},
 >  {name: "Here's a Grid",
 >	type: "table",
 >	data: [[1,2,3,4],[1,4,9,16]],
@@ -316,10 +324,13 @@ function showData(title, tabs, size) {
 	for(var i = 0; i < tabs.length; i++){
 		var tab = {layout: "fit"};
 		tab.title = tabs[i].name;
-		if(tabs[i].type == "text"){
+		if(tabs[i].type.toLowerCase() == "text"){
 			var textData = {xtype: "textareafield", value: tabs[i].data, readOnly: true};
 			tab.items = [textData];
-		}else if(tabs[i].type == "table"){
+		}else if(tabs[i].type.toLowerCase() == "html"){
+			var htmlData = {title: "Insight Equations", xtype: "box", html: tabs[i].data, style: "background-color: white", autoScroll: true};
+			tab.items = [htmlData];
+		}else if(tabs[i].type.toLowerCase() == "table"){
 			var gridData = {xtype: "grid"};
 			var gridColumns = [];
 			var storeFields = [];
@@ -361,7 +372,7 @@ function showData(title, tabs, size) {
 			}];
 			tab.items = [gridData];
 			
-		}else if(tabs[i].type == "chart"){
+		}else if(tabs[i].type.toLowerCase() == "chart"){
 			var defaultColors = [ "#94ae0a", "#115fa6","#a61120", "#ff8809", "#ffd13e", "#a61187", "#24ad9a", "#7c7474", "#a66111"];
 			var defaultColorIndex = 0;
 			var colors = [];

@@ -81,11 +81,14 @@ var Vector = function(items){
 	this.items = items;
 }
 Vector.prototype.toNum = function(){
-	var res = [];
-	for(var i=0; i<this.items.length; i++){
-		res.push(this.items[i].toNum());
+	if(this.isNum){
+		return this;
 	}
-	return new Vector(res);
+	for(var i=0; i<this.items.length; i++){
+		this.items[i] = this.items[i].toNum();
+	}
+	this.isNum = true;
+	return this;
 };
 Vector.prototype.toString = function(){
 	return '&laquo;'+this.items.map(function(x){return prepareDisplay(x.toNum().toString())}).join(", ")+'&raquo;';
@@ -99,7 +102,6 @@ Vector.prototype.combine = function(other, operation, rhs){
 			throw "MSG: Vectors must have equal length when combined.";
 		}
 	}
-	var res = [];
 	for(var i=0; i< this.length(); i++){
 		var x;
 		if(other instanceof Vector){
@@ -108,31 +110,31 @@ Vector.prototype.combine = function(other, operation, rhs){
 			x = other;
 		}
 		if(rhs){
-			res.push(operation(x, this.items[i]));
+			this.items[i] = operation(x, this.items[i]);
 		}else{
-			res.push(operation(this.items[i], x));
+			this.items[i] = operation(this.items[i], x);
 		}
 	}
-	return new Vector(res)
+	return this;
 };
 Vector.prototype.apply = function(operation){
-	var res = [];
 	for(var i=0; i < this.items.length; i++){
-		res.push(operation(this.items[i]));
+		this.items[i] = operation(this.items[i]);
 	}
-	return new Vector(res);
+	return this;
 };
 Vector.prototype.clone = function(){
 	var newItems = [];
 	for(var i=0; i<this.items.length; i++){
-		if(this.items[i] instanceof Material){
-			newItems.push(this.items[i]);
-		}else{
+		if(this.items[i] instanceof Vector){
 			newItems.push(this.items[i].clone());
+		}else{
+			newItems.push(this.items[i]);
 		}
 	}
 	return new Vector(newItems);
 };
+Vector.prototype.fullClone = Vector.prototype.clone;
 Vector.prototype.equals = function(vec){
 	if(this.length() != vec.length()){
 		return false;
@@ -180,17 +182,27 @@ function trimTree(root, primitiveBank){
 	return trimNode(root, primitiveBank);	
 }
 function evaluateTree(root, varBank){
-	return evaluateNode(root, varBank);	
+	try {
+		return evaluateNode(root, varBank);	
+	}catch(err){
+		if(err.returnVal){
+			return err.data;
+		}else{
+			throw(err);
+		}
+	}
 }
 
 function evaluate(input) {
 	//console.log(input);
 	var root = trimTree(createTree(input), primitiveBank);
+	//console.log(root);
+	var x;
 	try {
-		var x = evaluateTree(root, varBank);
+		x = evaluateTree(root, varBank);
 		//console.log(root);
  	}catch(err){
- 		if(err=="PLOT"){
+		 if(err=="PLOT"){
 			var res = {isPlot: true};
 			res.data = [];
 			var newBank = {};
@@ -265,7 +277,11 @@ funcEvalMap["LINES"] = function(node, scope) {
 	}
 	var response;
 	for(var i=0; i<node.children.length; i++){
-		response =  evaluateNode(node.children[i], scope);
+		if(node.children[i].text=="return"){
+			throw {returnVal: true, data: evaluateNode(node.children[i].children[0], scope)};
+		}else{
+			response =  evaluateNode(node.children[i], scope);
+		}
 	}
 	return response;
 };
@@ -630,7 +646,7 @@ funcEvalMap["IDENT"] = function(node, scope) {
 					return functionBank[varName]([]); //built-in
 				}
 			}
-			if(varName == "x"){
+			if(varName == "x" && window.timeStep === undefined){
 				throw "PLOT" ;
 			}else if(varName=="i"){//imaginary number
 				return new Material(sn("i"));
@@ -639,8 +655,11 @@ funcEvalMap["IDENT"] = function(node, scope) {
 			}
 		}
 	}
-
-	return scope[varName];
+	if(scope[varName].fullClone){
+		return scope[varName].fullClone();
+	}else{
+		return scope[varName];
+	}
 };
 
 funcEvalMap["ARRAY"] = function(node, scope) {
@@ -717,7 +736,16 @@ function makeFunctionCall(varName, varNames, varDefaults, node) {
 		for (var i = x.length; i < fn.localScope["nVars"]; i++) {
 			fn.localScope[fn.localScope[i += ""]] = fn.defaults[fn.defaults.length - (fn.localScope["nVars"]-i)];
 		}
-		return evaluateNode(node, fn.localScope);
+
+		try{
+			return evaluateNode(node, fn.localScope);
+		}catch(err){
+			if(err.returnVal){
+				return err.data;
+			}else{
+				throw(err);
+			}
+		}
 	};
 
 	return fn;
@@ -793,31 +821,24 @@ funcEvalMap["FUNCTION"] = function(node, scope) {
 funcEvalMap["ASSIGN"] = function(node, scope) {
 	//console.log(node);
 	if(node.children[0] instanceof PrimitiveStore){
-		var x = evaluateNode(node.children[3], scope);
+		var x = evaluateNode(node.children[1], scope);
 		node.children[0].primitive.setValue(x);
 		return x;
 	}else{
-		var varName = node.children[0].children[0].text;
-		if (node.children[0].children.length == 1) {// variable assignment
-			var x = evaluateNode(node.children[2], scope);
-			var origScope = scope;
-			while(scope["-parent"] !== null){
-				if(isDefined(scope[varName])){
-					break;
-				}
-				scope = scope["-parent"];
+		var varName = node.children[0].text;
+		var x = evaluateNode(node.children[1], scope);
+		var origScope = scope;
+		while(scope["-parent"] !== null){
+			if(isDefined(scope[varName])){
+				break;
 			}
-			if(scope["-parent"]===null && isUndefined(scope[varName])){
-				scope = origScope;
-			}
-			scope[varName] = x;
-			return varName + " = " + x;
-		} else { // function definition
-	
-			functionGenerator(varName, node.children[0], node.children[1], node.children[2])
-			
-			return '"' + varName + "\" defined"; 
+			scope = scope["-parent"];
 		}
+		if(scope["-parent"]===null && isUndefined(scope[varName])){
+			scope = origScope;
+		}
+		scope[varName] = x;
+		return varName + " = " + x;
 	}
 };
 

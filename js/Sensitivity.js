@@ -134,12 +134,12 @@ function doSensitivity(){
 					return
 				}
 				if(bounds.length<1){
-					mxUtils.alert("You must specify one or more bounds as precentages.")
+					mxUtils.alert("You must specify one or more bounds as percentages.")
 					return
 				}
 				for(var b=0; b< bounds.length; b++){
 					if(bounds[b]<=0 || bounds[b]>100){
-						mxUtils.alert("Bounds are precentages that must be between 0 and 100.")
+						mxUtils.alert("Bounds are percentages that must be between 0 and 100.")
 						return
 					}
 				}

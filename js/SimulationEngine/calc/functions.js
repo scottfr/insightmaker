@@ -175,7 +175,7 @@ functionBank["map"] = function(x) {
 	testArgumentsSize(x, "Map", 2, 2);
 	var v = evaluateNode(x[0].node, x[0].scope);
 	if(! (v instanceof Vector)){
-		throw "MSG: \"Map\" requires a vector as its first argument.";
+		throw "MSG: Map() requires a vector as its first argument.";
 	}
 	var node = x[1].node;
 	var scope = {x: null, "-parent": x[0].scope}
@@ -192,7 +192,7 @@ functionBank["sample"] = function(x) {
 	var v = x[0].toNum();
 	var count = x[1].toNum().value;
 	if(! (v instanceof Vector)){
-		throw "MSG: \"Sample\" requires a vector as its first argument.";
+		throw "MSG: Sample() requires a vector as its first argument.";
 	}
 	if(count == 0){
 		return new Vector([]);
@@ -202,7 +202,7 @@ functionBank["sample"] = function(x) {
 	var repeat = x[2] && trueValue(x[2].toNum());
 	
 	if(length==0){
-		throw "MSG: \"Sample\" requires a non-empty vector.";
+		throw "MSG: Sample() requires a non-empty vector.";
 	}
 	var res = [];
 	if(repeat){
@@ -211,18 +211,13 @@ functionBank["sample"] = function(x) {
 		}
 	}else{
 		if(length<count){
-			throw "MSG: \"Sample\" vector is too small for the given sample size.";	
+			throw "MSG: Vector for Sample() is too small for the given sample size.";	
 		}
-		var arr = v.items;
-		var size  = count;
-		var shuffled = arr.slice(0), i = arr.length, min = i - size, temp, index;
-		    while (i-- > min) {
-		        index = Math.floor(i * Rand());
-		        temp = shuffled[index];
-		        shuffled[index] = shuffled[i];
-		        shuffled[i] = temp;
-		    }
-		    res = shuffled.slice(min);
+		
+		var shuffled = v.items.slice();
+		for (var i = 0; i < count; i++) {
+		    res.push(shuffled.splice(Math.floor(Rand() * shuffled.length), 1)[0]);
+		}
 	}
 	
 	return new Vector(res);
@@ -264,7 +259,7 @@ functionBank["filter"] = function(x) {
 	testArgumentsSize(x, "Filter", 2, 2);
 	var v = evaluateNode(x[0].node, x[0].scope);
 	if(! (v instanceof Vector)){
-		throw "MSG: \"Filter\" requires a vector as its first agrument.";
+		throw "MSG: Filter() requires a vector as its first agrument.";
 	}
 	var t = functionBank["map"](x);
 	return  functionBank["select"]([v,t]);
@@ -536,13 +531,13 @@ defineFunction("Correlation", {params:  [{name: "Vector 1", needVector: true}, {
 		throw "MSG: You must have at least two elements in your vectors to calculate their correlation.";
 	}
 	if(v1.length() != v2.length()){
-		throw "MSG: The vectors for \"Correlation\" must be of the same size.";
+		throw "MSG: The vectors for Correlation() must be of the same size.";
 	}
 	
 	var v1_mean = functionBank["mean"]([v1]);
 	var v2_mean = functionBank["mean"]([v2]);
 	
-	return div(functionBank["sum"]([mult(minus(v1, v1_mean), minus(v2, v2_mean))]), mult(minus(functionBank["count"]([v1]), new Material(1)), mult(functionBank["stddev"]([v1]), functionBank["stddev"]([v2]))))
+	return div(functionBank["sum"]([mult(minus(v1.clone(), v1_mean), minus(v2.clone(), v2_mean))]), mult(minus(functionBank["count"]([v1]), new Material(1)), mult(functionBank["stddev"]([v1]), functionBank["stddev"]([v2]))))
 });
 functionBank["count"] = function(x) {
 	x = functionBank["join"](x).items;
@@ -636,9 +631,9 @@ function defineFunction(name, definition, fn){
 
 function factorial(x) {
 	if (Math.round(x) != x) {
-		throw "MSG: The \"factorial\" function only accepts integers.";
+		throw "MSG: The factorial() function only accepts integers.";
 	} else if (x < 0) {
-		throw "MSG: The \"factorial\" function is only defined for 0 or larger."
+		throw "MSG: The factorial() function is only defined for integers 0 or larger."
 	}
 	if (x > 1) {
 		return x * factorial(x - 1);

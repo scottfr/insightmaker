@@ -316,7 +316,7 @@ function openDisplayConfigure(win) {
 						id: 'chartTitle',
 						name: 'chartTitle',
 						allowBlank: false,
-						regex: /^[a-zA-Z](\-|[a-zA-Z0-9 ])*$/,
+						regex: /^[a-zA-Z][a-zA-Z0-9\-_ \$\&\?\.\,\#\%]*$/,
 						regexText: "Only letters, numbers, dashes and spaces allowed in titles."
 					},
 					Ext.create('Ext.form.ComboBox', {
@@ -1664,7 +1664,7 @@ function buildHistogramStore(item, time){
 	item.store.loadData(createHistogramData(item.data[time], item.min, item.max));
 	
 }
-//var globalvec;
+
 function createHistogramChart(displayInformation, i){
 	var store = new Ext.data.JsonStore({
 			fields: [{
@@ -1680,10 +1680,6 @@ function createHistogramChart(displayInformation, i){
 	var histogram = {store: store, data: displayInformation.res[displayInformation.ids[i]].results};
 	
 	var vecs = histogram.data;
-	//globalvec=vecs;
-	//console.log("===");
-	//console.log(vecs);
-	//console.log(functionBank["join"](vecs).toNum().items);
 	
 	try{
 		//console.log(functionBank["min"](vecs));
@@ -1732,7 +1728,14 @@ function createHistogramChart(displayInformation, i){
 	        type: 'column',
 	        xField: 'Label',
 	        yField: "Count",
-			gutter: 5
+			gutter: 5,
+			tips: {
+				trackMouse: true,
+				width: 80,
+				renderer: function(storeItem, item) {
+					this.setTitle("<center>"+commaStr(item.value[1])+"</center>");
+				}
+			}
 	    }]
     });
 	

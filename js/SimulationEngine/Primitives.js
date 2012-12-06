@@ -46,6 +46,7 @@ Primitive.method("clone", function(){
 	p.unitless = this.unitless;
 	
 	//p.equation = 1;//equation is set through linking
+	
 	this.innerClone(p);
 	
 	return p;
@@ -92,13 +93,13 @@ Primitive.method("getPastValues",  function( length ){
 	    }
 	}
 	if(RKOrder==4){
-	var it = true;
-	for(var i=res.length-1; i>=0; i--){
-		it=!it
-		if(it){
-			res.splice(i, 1);
+		var it = true;
+		for(var i=res.length-1; i>=0; i--){
+			it=!it
+			if(it){
+				res.splice(i, 1);
+			}
 		}
-	}
 	}
     return res;
 });
@@ -118,7 +119,7 @@ Primitive.method("pastValue", function pastValue(delay, defaultValue){
     if( Math.ceil(periods) > this.pastValues.length ){
         if( isUndefined(defaultValue) ){
           if( this.pastValues.length > 0 ){
-            return this.pastValues[0];
+            return this.pastValues[0].fullClone();
           }else{
             return this.value();
           }
@@ -131,7 +132,7 @@ Primitive.method("pastValue", function pastValue(delay, defaultValue){
       if( periods == 0 ){
         return value;
       }else{
-        return this.pastValues[this.pastValues.length - periods];
+        return this.pastValues[this.pastValues.length - periods].fullClone();
       }
     }
     
@@ -165,7 +166,7 @@ Primitive.method("smoothF", function( delay , initialV){
        dat.push(plus(mult(dat[i-1], new Material(1-a)), mult(new Material(a), this.pastValues[i]))); 
     }
 	
-    return dat[dat.length-1];
+    return dat[dat.length-1].fullClone();
   });
 Primitive.method("expDelayF", function( order , delay , initialV ){
     this.value();
@@ -187,7 +188,7 @@ Primitive.method("expDelayF", function( order , delay , initialV ){
       dat.push(dat[i-1].moveForward(this.pastValues[i]));
     }
     
-    return dat[dat.length-1].out;
+    return dat[dat.length-1].out.fullClone();
   });
 Primitive.method("testUnits", function(m, ignoreFlow) {
 	if( unitless(this.units) && (! (m instanceof Vector) && ! unitless(m.units))){

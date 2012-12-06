@@ -19,21 +19,26 @@ RandList.prototype.get = function(i) {
   }
   return this.vals[i];
 }
-// ********** Code for top level **************
+
 var PreviousRandLists = [];
 var RandLoc = -1;
 var lastRandPos = -1;
+var RKOrder = 1;
+
 function getRandPos() {
-    if(window.TimeStep === undefined){
+    if(window.timeStep === undefined){
     	return 0; //HeroCalc
     }else{
-    	return Math.floor(Time.value/TimeStep.value); //Insight Maker
+    	return Math.floor(time.value/timeStep.value); //Insight Maker
     }
 }
 
 function Rand(minVal, maxVal) {
   if (minVal != null) {
     return Rand() * (maxVal - minVal) + minVal;
+  }
+  if(RKOrder == 1){
+  	return Math.random();
   }
   var RandPos = getRandPos();
   if (RandPos != lastRandPos) {

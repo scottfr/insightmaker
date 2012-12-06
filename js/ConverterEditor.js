@@ -54,8 +54,8 @@ Ext.ConverterWindow = function(args)
 		if(! isUndefined(chart)){
 		//console.log(chart.items.items[0].axes.items[0]);
 		//console.log(getXRange());
-			chart.items.items[0].axes.items[1].minimum = getXRange()[0];
-			chart.items.items[0].axes.items[1].maximum = getXRange()[1];
+			chart.axes.items[1].minimum = getXRange()[0];
+			chart.axes.items[1].maximum = getXRange()[1];
 		}
 	
         var oldKeys = "";
@@ -121,8 +121,8 @@ Ext.ConverterWindow = function(args)
         sorters: ['xVal']
     });
 
-    var editor = new Ext.grid.plugin.RowEditing({
-        saveText: 'Apply'
+    var editor = new Ext.grid.plugin.CellEditing({
+		clicksToEdit: 1
     });
 
     var gridPan = new Ext.grid.GridPanel({
@@ -177,7 +177,8 @@ Ext.ConverterWindow = function(args)
             editor: {
                 xtype: 'numberfield',
                 allowBlank: false,
-                decimalPrecision: 10
+                decimalPrecision: 10,
+				selectOnFocus:true
             }
         },
         {
@@ -189,7 +190,8 @@ Ext.ConverterWindow = function(args)
             editor: {
                 xtype: 'numberfield',
                 allowBlank: false,
-                decimalPrecision: 10
+                decimalPrecision: 10,
+				selectOnFocus:true
             }
         }
         ]
@@ -217,17 +219,7 @@ Ext.ConverterWindow = function(args)
         sourceName = findID(cell.getAttribute("Source")).getAttribute("name");
     }
 
-    var chart = new Ext.Panel({
-        width: 490,
-        height: 200,
-        layout: 'fit',
-        margins: '5 5 0',
-        region: 'north',
-        split: true,
-        minHeight: 100,
-        maxHeight: 500,
-
-        items: {
+    var chart = new Ext.chart.Chart({
             xtype: 'chart',
             store: chartStore,
             animate: false,
@@ -272,7 +264,22 @@ Ext.ConverterWindow = function(args)
                     }
                 }
             }]
-        }
+        });
+	
+
+		
+		
+	var chartPanel = new Ext.Panel({
+        width: 490,
+        height: 200,
+        layout: 'fit',
+        margins: '5 5 0',
+        region: 'north',
+        split: true,
+        minHeight: 100,
+        maxHeight: 500,
+
+        items: chart
     });
 
 
@@ -290,7 +297,7 @@ Ext.ConverterWindow = function(args)
         },
         width: 508,
         height: 500,
-        items: [chart, gridPan],
+        items: [chartPanel, gridPan],
         buttons: [{
 			disabled: ! is_editor,
 			scale: "large",
@@ -335,6 +342,7 @@ Ext.ConverterWindow = function(args)
             text: 'Apply',
             handler: function()
             {	
+				editor.completeEdit();
 				if(obj.args.parent != ""){
                 	obj.args.parent.setValue(getKeys());
 				}else{
@@ -347,6 +355,8 @@ Ext.ConverterWindow = function(args)
 				if(obj.args.parent != ""){
                 	obj.args.parent.resumeEvents();
                 	grid.plugins[0].completeEdit();
+				}else{
+					selectionChanged(false);
 				}
             }
         }]
@@ -390,6 +400,16 @@ Ext.ConverterWindow = function(args)
     obj.show = function()
     {
         obj.win.show();
+
+		/*chart.on({
+		  click: function(e) {
+			  
+		    console.log(e);
+			console.log(chart.getEventXY(e));
+			console.log(e.getXY());
+			console.log(e.getPoint());
+		  }
+		});*/
     }
 }
 

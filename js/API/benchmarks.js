@@ -32,15 +32,24 @@ function timeModel(name, code, base, reps){
 	importMXGraph(code);
 	var times = [];
 	var total = 0;
-	for(var i = 0; i < reps; i++){
-		benchmarkPrint("Run "+(i+1)+": ");
+	for(var i = 0; i <= reps; i++){
+		if(i<reps){
+			benchmarkPrint("Run "+(i+1)+": ");
+		}else{
+			setAlgorithm("RK4");
+			benchmarkPrint("RK4 Test: ");
+		}
 		var start = Date.now();
 		runModel(true);
 		var diff = (Date.now()-start)/1000;
-		times.push(diff);
-		total = total + diff;
+		if(i<reps){
+			times.push(diff);
+			total = total + diff;
+		}
 		benchmarkPrint(diff+" seconds\n");
 	}
+	
+	
 
 	benchmarkPrint("\nAverage: "+total/reps+" seconds\n");
 	benchmarkPrint("Compared to base: "+(total/reps)/base*100+"%\n");

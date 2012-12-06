@@ -1419,6 +1419,44 @@ function testSimulation(){
 		
 		clearModel();
 		
+		var p1 = createPrimitive("y1", "Variable", [0,0], [100,100]);
+		var p2 = createPrimitive("y2", "Variable", [0,0], [100,100]);
+		var p3 = createPrimitive("x", "Variable", [0,0], [100,100]);
+		var l = createConnector("l", "Link", p3, p1);
+		var l2 = createConnector("l2", "Link", p3, p2);
+		
+		setUnits(p2,"Centimeters");
+		setValue(p3, "years");
+		setValue(p1, "delay([x],3)");
+		setValue(p2, "delay([x],5)");
+		var res = runModel(true);
+		
+		assertEqual("Past Values Clone Check 1",res.value(p1)[10], 7)
+		assertEqual("Past Values Clone Check 2",res.value(p2)[10], 5)
+		assertEqual("Past Values Clone Check 3",res.value(p3)[10], 10)	
+		
+		setValue(p1, "delay1([x],2)");
+		setValue(p2, "delay1([x],2)");
+		var res = runModel(true);
+		
+		assertEqual("Past Values Clone Check 4", res.error, "none");
+		
+		setValue(p1, "delay3([x],2)");
+		setValue(p2, "delay3([x],2)");
+		var res = runModel(true);
+		
+		assertEqual("Past Values Clone Check 5", res.error, "none");
+		
+		setValue(p1, "smooth([x],2)");
+		setValue(p2, "smooth([x],2)");
+		var res = runModel(true);
+		
+		assertEqual("Past Values Clone Check 6", res.error, "none");
+				
+		
+		clearModel();
+		
+		
 		p1 = createPrimitive("x", "Variable", [0,0], [100,100]);
 		p2 = createPrimitive("y", "Variable", [0,0], [100,100]);
 
