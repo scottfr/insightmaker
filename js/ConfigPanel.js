@@ -190,7 +190,8 @@ function createGrid(properties, topItems, bottomItems, selectedPrimitive) {
                         if (isTrue(selectedPrimitive.getAttribute("OnlyPositive"))) {
                             graph.setCellStyles(mxConstants.STYLE_STARTARROW, "",[selectedPrimitive]);
                         } else {
-                            graph.setCellStyles(mxConstants.STYLE_STARTARROW, mxConstants.ARROW_OPEN, [selectedPrimitive]);
+                            graph.setCellStyles(mxConstants.STYLE_STARTARROW, "block", [selectedPrimitive]);
+                            graph.setCellStyles("startFill", 0, [selectedPrimitive]);
                         }
                     }
                     if (selectedPrimitive.value.nodeName == "Link") {

@@ -54,8 +54,9 @@ var timeUnits = null;
 function innerRunSimulation(silent) {
 	silent = isUndefined(silent) ? false : silent;
 	
+	allPlaceholders = [];
 	var model = {};
-	submodels = {"base": {id: "base", "DNA":[], agents: [{children: []}], size: 1}};
+	submodels = {"base": {id: "base", "DNA":[], agents: [{children: [], childrenId: {}}], size: 1}};
 	var setting = getSetting();
 
 	strictUnits = isTrue(setting.getAttribute("StrictUnits"));
@@ -167,6 +168,7 @@ function innerRunSimulation(silent) {
 				agent.parent = submodel;
 				agent.index = j;
 				agent.children = [];
+				agent.childrenId = {};
 				agent.agentId = item.id;
 				agent.createIds();
 				submodel.agents.push(agent);
@@ -210,8 +212,7 @@ function innerRunSimulation(silent) {
 				linkPrimitive(submodel.agents[j].children[i], submodel.DNA[i]);
 			}
 		}
-	} 		
-			
+	} 
 			
 	if(isDefined(setting.getAttribute("Macros"))){
 		try{
@@ -415,7 +416,7 @@ function tally(arr) {
         else if ( arr[i] !== prev ) {
 			res[arr[i].toString()] = 1;
         } else {
-            res[prev.toString()] = res[prev.toString()]+1;
+            res[prev.toString()] = res[prev.toString()] + 1;
         }
         prev = arr[i];
     }
@@ -426,7 +427,7 @@ function tally(arr) {
 function aggregateAgentSeries(res){
 	var data = res.results.map(function(x){
 		var states = [];
-		x.current.forEach(function(x){states = states.concat(x.state.map(function(x){return x.id.toString()}))})
+		x.current.forEach(function(x){states = states.concat(x.state?x.state.map(function(x){return x.id.toString()}):[])});
 		
 		var items = tally(states);
 		res.data.states.forEach(function(key){
@@ -743,8 +744,10 @@ function decodeDNA(dna, agent){
 		}
 		
 		agent.children.push(x);
+		agent.childrenId[x.id] = x;
 	}else if(type == "Agents"){
 		agent.children.push(dna.agents);
+		agent.childrenId[dna.id] = dna;
 	}
 }
 
@@ -971,8 +974,11 @@ function buildPlacements(submodel, items){
 }
 
 
+var allPlaceholders = {};
 function getPrimitiveNeighborhood(primitive, dna){
 	var neighbors = neighborhood(dna.cell);
+	var placeholders = allPlaceholders[dna.id]?allPlaceholders[dna.id]:{};
+	
 	var hood = {
 		self: primitive
 	};
@@ -980,42 +986,47 @@ function getPrimitiveNeighborhood(primitive, dna){
 	//console.log("----");
 	//console.log(dna.name);
 	
-	if(dna.type=="Agents"){
-		for(var i=0; i<primitive.DNA.length; i++){
-			hood[primitive.DNA[i].name.toLowerCase()] = new Placeholder(primitive.DNA[i].name, primitive.DNA[i].id, primitive);
+	if(! neighbors.placeholders){
+		if(dna.type=="Agents"){
+			for(var i=0; i<primitive.DNA.length; i++){
+				placeholders[primitive.DNA[i].name.toLowerCase()] = new Placeholder(primitive.DNA[i], primitive);
+			}
 		}
 	}
 	for(var k=0; k<neighbors.length; k++){
 		var item = neighbors[k].item;
 		if(item.value.nodeName == "Agents"){
 			hood[submodels[item.id].name.toLowerCase()] = submodels[item.id];
-			for(var i = 0; i < submodels[item.id].DNA.length; i++){
-				hood[submodels[item.id].DNA[i].name.toLowerCase()] = new Placeholder(submodels[item.id].DNA[i].name, submodels[item.id].DNA[i].id, primitive);
+			if(! neighbors.placeholders){
+				for(var i = 0; i < submodels[item.id].DNA.length; i++){
+					hood[submodels[item.id].DNA[i].name.toLowerCase()] = new Placeholder(submodels[item.id].DNA[i], primitive);
+				}
 			}
 		}else{
-
+			
 			//console.log(getName(item));
 			var found = false;
 			if(primitive.parent){
-				for (var j = 0; j < primitive.parent.children.length; j++) {
-					if (primitive.parent.children[j].id == item.id) {
-						hood[primitive.parent.children[j].name.toLowerCase()] = primitive.parent.children[j];
-						found = true;
-						break;
-					}
+				if(primitive.parent.childrenId[item.id]){
+					hood[primitive.parent.childrenId[item.id].name.toLowerCase()] = primitive.parent.childrenId[item.id];
+					found = true;
 				}
 			}
 			if(! found){
-				for (var j = 0; j < submodels["base"]["agents"][0].children.length; j++) {
-					if (submodels["base"]["agents"][0].children[j].id == item.id) {
-						hood[submodels["base"]["agents"][0].children[j].name.toLowerCase()] = submodels["base"]["agents"][0].children[j];
-						found = true;
-						break;
-					}
+				if (submodels["base"]["agents"][0].childrenId[item.id]) {
+					hood[submodels["base"]["agents"][0].childrenId[item.id].name.toLowerCase()] = submodels["base"]["agents"][0].childrenId[item.id];
+					found = true;
 				}
 			}
 		}
 	}
+	
+
+	var keys = Object.keys(placeholders);
+	for(var i=0; i<keys.length; i++){
+		hood[keys[i]] = placeholders[keys[i]];
+	}
+	allPlaceholders[dna.id] = placeholders;
 	
 	//console.log(hood);
 	

@@ -11,195 +11,176 @@ terms of the Insight Maker Public License (http://insightMaker.com/impl).
 
 
 // Defines a new class for all icons
-function mxIconSet(state)
- {
-    this.images = [];
-    var graph = state.view.graph;
-    var md = (mxClient.IS_TOUCH) ? 'touchstart': 'mousedown';
 
-	
-		var cell = orig(state.cell);
-		
-    if (isValued(cell) || cell.value.nodeName == "Action") {
-        //equation
-        var img = mxUtils.createImage(builder_path+'/images/equal.png');
-        img.setAttribute('title', '');
-        img.style.position = 'absolute';
-        img.style.cursor = 'pointer';
-        img.style.width = '16px';
-        img.style.height = '16px';
-        img.style.left = (state.x + 2)+"px";
-        img.style.top = (state.y + 2)+"px";
-		
-		if(state.width<2){
-        	img.style.left = state.x + state.width - 20;
+function mxIconSet(state) {
+	this.images = [];
+	var graph = state.view.graph;
+	var md = (mxClient.IS_TOUCH) ? 'touchstart' : 'mousedown';
+
+
+	var cell = orig(state.cell);
+
+	if (isValued(cell) || cell.value.nodeName == "Action") {
+		//equation
+		var img = mxUtils.createImage(builder_path + '/images/equal.png');
+		img.setAttribute('title', '');
+		img.style.position = 'absolute';
+		img.style.cursor = 'pointer';
+		img.style.width = '16px';
+		img.style.height = '16px';
+		img.style.left = (state.x + 2) + "px";
+		img.style.top = (state.y + 2) + "px";
+
+		if (state.width < 2) {
+			img.style.left = state.x + state.width - 20;
 		}
 
-        mxEvent.addListener(img, md,
-        mxUtils.bind(this,
-        function(evt)
-        {
-            // Disables dragging the image
-            mxEvent.consume(evt);
-        })
-        );
+		mxEvent.addListener(img, md,
+		mxUtils.bind(this,
 
-        mxEvent.addListener(img, 'click',
-        mxUtils.bind(this,
-        function(evt)
-        {
-            showEditor(cell);
+		function(evt) {
+			// Disables dragging the image
+			mxEvent.consume(evt);
+		}));
 
-            mxEvent.consume(evt);
-        })
-        );
+		mxEvent.addListener(img, 'click',
+		mxUtils.bind(this,
 
-        state.view.graph.container.appendChild(img);
-        this.images.push(img);
-    }
+		function(evt) {
+			//console.log(Ext.get(evt.srcElement));
+			showEditor(cell)//, Ext.get(evt.srcElement));
+
+			mxEvent.consume(evt);
+		}));
+
+		state.view.graph.container.appendChild(img);
+		this.images.push(img);
+	}
 
 
-    if (cell.value.getAttribute("Note") != null && Ext.String.trim(cell.value.getAttribute("Note")) != "") {
-        // Note
-        var img = mxUtils.createImage(builder_path+'/images/note.png');
-        img.setAttribute('title', '');
-        img.style.position = 'absolute';
-        img.style.cursor = 'pointer';
-        img.style.width = '16px';
-        img.style.height = '16px';
-        img.style.left = (state.x + state.width - 18)+"px";
-        img.style.top = (state.y + 2)+"px";
-		if(state.width<2){
-        	img.style.left = state.x + 2;
+	if (cell.value.getAttribute("Note") != null && Ext.String.trim(cell.value.getAttribute("Note")) != "") {
+		// Note
+		var img = mxUtils.createImage(builder_path + '/images/note.png');
+		img.setAttribute('title', '');
+		img.style.position = 'absolute';
+		img.style.cursor = 'pointer';
+		img.style.width = '16px';
+		img.style.height = '16px';
+		img.style.left = (state.x + state.width - 18) + "px";
+		img.style.top = (state.y + 2) + "px";
+		if (state.width < 2) {
+			img.style.left = state.x + 2;
 		}
-		
-		
-        mxEvent.addListener(img, md,
-        mxUtils.bind(this,
-        function(evt)
-        {
-            // Disables dragging the image
-            mxEvent.consume(evt);
-        })
-        );
 
-        mxEvent.addListener(img, 'click',
-        mxUtils.bind(this,
-        function(evt)
-        {
-            var x = Ext.getCmp("note" + cell.id);
-            if (isUndefined(x)) {
-                var tooltip = new Ext.ToolTip(
-                {
-                    html: "<big>" + clean(cell.value.getAttribute("Note").replace(/\n/g, "<br/>")) + "</big>",
-                    autoHide: false,
-                    closable: true,
-					width:250,
-                    draggable: true,
-                    id: "note" + cell.id,
-                    title: clean(cell.value.getAttribute("name")),
-					closeAction:'destroy'
-                });
-                //console.log(evt);
-                tooltip.showAt([evt.clientX + 17, evt.clientY - 8]);
-                mxEvent.consume(evt);
-            } else {
-                x.destroy();
-            }
-        })
-        );
 
-        state.view.graph.container.appendChild(img);
-        this.images.push(img);
-    };
+		mxEvent.addListener(img, md,
+		mxUtils.bind(this,
+
+		function(evt) {
+			// Disables dragging the image
+			mxEvent.consume(evt);
+		}));
+
+		mxEvent.addListener(img, 'click',
+		mxUtils.bind(this,
+
+		function(evt) {
+			var x = Ext.getCmp("note" + cell.id);
+			if (isUndefined(x)) {
+				var tooltip = new Ext.ToolTip({
+					html: "<big>" + clean(cell.value.getAttribute("Note")
+						.replace(/\n/g, "<br/>")) + "</big>",
+					autoHide: false,
+					closable: true,
+					width: 250,
+					draggable: true,
+					id: "note" + cell.id,
+					title: clean(cell.value.getAttribute("name")),
+					closeAction: 'destroy'
+				});
+				//console.log(evt);
+				tooltip.showAt([evt.clientX + 17, evt.clientY - 8]);
+				mxEvent.consume(evt);
+			} else {
+				x.destroy();
+			}
+		}));
+
+		state.view.graph.container.appendChild(img);
+		this.images.push(img);
+	};
 }
-mxIconSet.prototype.destroy = function()
- {
-    if (this.images != null)
-    {
-        for (var i = 0; i < this.images.length; i++)
-        {
-            var img = this.images[i];
-            img.parentNode.removeChild(img);
-        }
-    }
+mxIconSet.prototype.destroy = function() {
+	if (this.images != null) {
+		for (var i = 0; i < this.images.length; i++) {
+			var img = this.images[i];
+			img.parentNode.removeChild(img);
+		}
+	}
 
-    this.images = null;
+	this.images = null;
 };
 
 
 function setupHoverIcons() {
 
-    var iconTolerance = 20;
+	var iconTolerance = 20;
 
-    // Shows icons if the mouse is over a cell
-    graph.addMouseListener(
-    {
-        currentState: null,
-        currentIconSet: null,
-        mouseDown: function(sender, me)
-        {
-            // Hides icons on mouse down
-            if (this.currentState != null)
-            {
-                this.dragLeave(me.getEvent(), this.currentState);
-                this.currentState = null;
-            }
-        },
-		    mouseMove: function(sender, me)
-		    {
-		    	// Ignores event if over current cell (with tolerance)
-		    	if (this.currentState != null && (me.getState() == this.currentState || me.getState() == null))
-		    	{
-		    		var tol = iconTolerance;
-		    		var tmp = new mxRectangle(me.getGraphX() - tol,
-		    			me.getGraphY() - tol, 2 * tol, 2 * tol);
+	// Shows icons if the mouse is over a cell
+	graph.addMouseListener({
+		currentState: null,
+		currentIconSet: null,
+		mouseDown: function(sender, me) {
+			// Hides icons on mouse down
+			if (this.currentState != null) {
+				this.dragLeave(me.getEvent(), this.currentState);
+				this.currentState = null;
+			}
+		},
+		mouseMove: function(sender, me) {
+			// Ignores event if over current cell (with tolerance)
+			if (this.currentState != null && (me.getState() == this.currentState || me.getState() == null)) {
+				var tol = iconTolerance;
+				var tmp = new mxRectangle(me.getGraphX() - tol,
+				me.getGraphY() - tol, 2 * tol, 2 * tol);
 
-		    		if (mxUtils.intersects(tmp, this.currentState))
-		    		{
-		    			return;
-		    		}
-		    	}
-				    	
-				var tmp = graph.view.getState(me.getCell());
-				    	
-		    	// Ignores everything but vertices
-				if (graph.isMouseDown || (tmp != null && !(graph.getModel().isEdge(tmp.cell) || graph.getModel().isVertex(tmp.cell))))
-            {
-                tmp = null;
-            }
+				if (mxUtils.intersects(tmp, this.currentState)) {
+					return;
+				}
+			}
 
-            if (tmp != this.currentState)
-            {
-                if (this.currentState != null)
-                {
-                    this.dragLeave(me.getEvent(), this.currentState);
-                }
+			var tmp = graph.view.getState(me.getCell());
 
-                this.currentState = tmp;
+			// Ignores everything but vertices
+			if (graph.isMouseDown || (tmp != null && !(graph.getModel()
+				.isEdge(tmp.cell) || graph.getModel()
+				.isVertex(tmp.cell)))) {
+				tmp = null;
+			}
 
-                if (this.currentState != null)
-                {
-                    this.dragEnter(me.getEvent(), this.currentState);
-                }
-            }
-        },
-        mouseUp: function(sender, me) {},
-        dragEnter: function(evt, state)
-        {
-            if (this.currentIconSet == null)
-            {
-                this.currentIconSet = new mxIconSet(state);
-            }
-        },
-        dragLeave: function(evt, state)
-        {
-            if (this.currentIconSet != null)
-            {
-                this.currentIconSet.destroy();
-                this.currentIconSet = null;
-            }
-        }
-    });
+			if (tmp != this.currentState) {
+				if (this.currentState != null) {
+					this.dragLeave(me.getEvent(), this.currentState);
+				}
+
+				this.currentState = tmp;
+
+				if (this.currentState != null) {
+					this.dragEnter(me.getEvent(), this.currentState);
+				}
+			}
+		},
+		mouseUp: function(sender, me) {},
+		dragEnter: function(evt, state) {
+			if (this.currentIconSet == null) {
+				this.currentIconSet = new mxIconSet(state);
+			}
+		},
+		dragLeave: function(evt, state) {
+			if (this.currentIconSet != null) {
+				this.currentIconSet.destroy();
+				this.currentIconSet = null;
+			}
+		}
+	});
 }
-

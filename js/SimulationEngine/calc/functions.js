@@ -269,10 +269,16 @@ functionBank["filter"].delayEvalParams = true;
 functionBank["join"] = function(x){
 	var res = [];
 	for(var i = 0; i < x.length; i++){
-		if(x[i] instanceof Vector){
-			res = res.concat(x[i].items)
+		var y = x[i];
+		
+		if(y instanceof Primitive){
+			y = y.toNum();
+		}
+		
+		if(y instanceof Vector){
+			res = res.concat(y.items);
 		}else{
-			res.push(x[i]);
+			res.push(y);
 		}
 	}
 	return new Vector(res);

@@ -155,6 +155,7 @@ function clearPrimitiveCache(){
 }
 
 function neighborhood(target) {
+	var targetInAgent = inAgent(target);
 	if(neighborhoodCache[target.id]){
 		return neighborhoodCache[target.id];
 	}
@@ -165,7 +166,7 @@ function neighborhood(target) {
             var flows = [];
             var links = [];
             if (target.isEdge()) {
-				if(orig(target.source)!==null){
+				if(orig(target.source)!==null ){
                 	hood.push({item: orig(target.source), type: "direct"});
 				}
 				if(orig(target.target)!== null){
@@ -201,7 +202,7 @@ function neighborhood(target) {
                     hood.push({item: orig(links[i].target), type: "direct", linkHidden: linkHidden});
 					hood = hood.concat(getAgentItems(links[i].target, linkHidden))
                 }
-                if (links[i].target == target && (isDefined(links[i].source) && links[i].source !== null) ) {
+                if (links[i].target == target && (isDefined(links[i].source) && links[i].source !== null) && ! (inAgent(orig(links[i].source)) && ! targetInAgent) ) {
                     hood.push({item: orig(links[i].source), type: "direct"});
 					hood = hood.concat(getAgentItems(links[i].source))
                 }
@@ -237,8 +238,8 @@ function neighborhood(target) {
 	
 	function getAgentItems(agent, linkHidden){
 		var res  = [];
-		if(agent.value.nodeName == "Agents" && agent.getAttribute("Agent")){
-			var id = agent.getAttribute("Agent");
+		if(orig(agent).value.nodeName == "Agents" && orig(agent).getAttribute("Agent")){
+			var id = orig(agent).getAttribute("Agent");
 			if(id){
 				var items = getChildren(findID(id));
 				items.forEach(function(x){
@@ -463,14 +464,14 @@ function linkBroken(edge) {
     {
         if (myCells[i].value.nodeName == "Converter") {
             testConverterSource(myCells[i]);
-        }else if(myCells[i].value.nodeName == "Agents") {
+        }/*else if(myCells[i].value.nodeName == "Agents") {
             var source = myCells[i].getAttribute("Agent");
 			if(source){
 				if(! connected(myCells[i], findID(source))){
 					myCells[i].setAttribute("Agent", "");
 				}
 			}
-        }
+        }*/
     }
     if ((edge.getTerminal(false) !== null) && edge.getTerminal(false).value.nodeName == "Converter") {
         if (typeof(edge.getTerminal(true)) != "undefined") {

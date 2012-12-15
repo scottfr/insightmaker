@@ -253,6 +253,7 @@ function main() {
 	primitiveBank.display.setAttribute('FlipHorizontal', false);
 	primitiveBank.display.setAttribute('FlipVertical', false);
 	primitiveBank.display.setAttribute('LabelPosition', "Bottom");
+	primitiveBank.display.setAttribute('legendPosition', "Automatic");
 
 	function setValuedProperties(cell) {
 		cell.setAttribute('Units', "Unitless")
@@ -366,7 +367,7 @@ function main() {
 
 	primitiveBank.setting = doc.createElement('Setting');
 	primitiveBank.setting.setAttribute('Note', '');
-	primitiveBank.setting.setAttribute('Version', '25');
+	primitiveBank.setting.setAttribute('Version', '27');
 	primitiveBank.setting.setAttribute('Throttle', '1');
 	primitiveBank.setting.setAttribute('TimeLength', '100');
 	primitiveBank.setting.setAttribute('TimeStart', '0');
@@ -904,6 +905,31 @@ function main() {
 			setAllConnectable();
 
 			mySetting.setAttribute("Version", 25);
+		}
+		
+		if (mySetting.getAttribute("Version") < 26) {
+			
+			var flows = primitives("Flow");
+			for (var i = 0; i < flows.length; i++) {
+                if (! isTrue(flows[i].getAttribute("OnlyPositive"))) {
+                    graph.setCellStyles(mxConstants.STYLE_STARTARROW, "block", [flows[i]]);
+                    graph.setCellStyles("startFill", 0, [flows[i]]);
+                }
+			}
+			
+
+			mySetting.setAttribute("Version", 26);
+		}
+		
+		if (mySetting.getAttribute("Version") < 27) {
+			
+			
+			var displays = primitives("Display");
+			for (var i = 0; i < displays.length; i++) {
+				displays[i].setAttribute("legendPosition", "Automatic");
+			}
+			
+			mySetting.setAttribute("Version", 27);
 		}
 
 	}
@@ -1635,7 +1661,7 @@ function main() {
 			});
 
 		} else if (cellType == "Variable") {
-			bottomDesc = descBase + "<p>A variable is a dynamically updated object in your model that synthesizes available data or provides a constant value for uses in your equations. The birth rate of a population or the maximum volume of water in a lake are both possible uses of variables.</p>" + (is_editor ? "<br/><h1>Examples of valid Values:</h1><center><table class='undefined'><tr><td align=center>Static Value</td></tr><tr><td align=center><i>7.2</i></td></tr><tr><td>Using Current Simulation Time</td></tr><tr><td align=center><i>seconds^2+6</i></td></tr><tr><td align=center>Referencing Other Primitives</td></tr><tr><td align=center><i>[Lake Volume]*2</i></td></tr></table></center>" : "");
+			bottomDesc = descBase + "<p>A variable is a dynamically updated object in your model that synthesizes available data or provides a constant value for use in your equations. The birth rate of a population or the maximum volume of water in a lake are both possible uses of variables.</p>" + (is_editor ? "<br/><h1>Examples of valid Values:</h1><center><table class='undefined'><tr><td align=center>Static Value</td></tr><tr><td align=center><i>7.2</i></td></tr><tr><td>Using Current Simulation Time</td></tr><tr><td align=center><i>seconds^2+6</i></td></tr><tr><td align=center>Referencing Other Primitives</td></tr><tr><td align=center><i>[Lake Volume]*2</i></td></tr></table></center>" : "");
 			properties.push({
 				'name': 'Equation',
 				'text': 'Value/Equation =',
@@ -1767,7 +1793,7 @@ function main() {
 			var dat = [];
 			var folders = primitives("Folder");
 			for (var i = 0; i < folders.length; i++) {
-				if (folders[i].getAttribute("Type") == "Agent" && connected(folders[i],cell)) {
+				if (folders[i].getAttribute("Type") == "Agent" /*&& connected(folders[i],cell)*/) {
 					dat.push([folders[i].id, clean(folders[i].getAttribute("name"))])
 				}
 			}
@@ -2108,6 +2134,7 @@ var makeGhost = function() {
 
 		vertex = graph.insertVertex(parent, null, primitiveBank.ghost.cloneNode(true), location[0] + 10, location[1] + 10, item.getGeometry().width, item.getGeometry().height, style);
 		vertex.value.setAttribute("Source", item.id);
+		vertex.value.setAttribute("name", item.getAttribute("name"));
 		graph.setSelectionCell(vertex);
 		graph.getModel().endUpdate();
 

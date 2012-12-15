@@ -512,7 +512,9 @@ defineFunction("FindIndex", {params: [{needPopulation: true, name: "[Agent Popul
 defineFunction("FindState", {params: [{needPopulation: true, name: "[Agent Population]"}, {needPrimitive: true, name: "[State]"}]}, function(x) {
 
 	var population = x[0];
-	
+	if(! ((x[1] instanceof State) || (x[1].dna.type == "State"))){
+		throw "MSG: FindState() requires a State primitive as its second argument.";
+	}
 	var id = x[1].id;
 	var res = [];
 	for(var i = 0; i < population.length(); i++){
@@ -530,6 +532,9 @@ defineFunction("FindState", {params: [{needPopulation: true, name: "[Agent Popul
 defineFunction("FindNotState", {params: [{needPopulation: true, name: "[Agent Population]"}, {needPrimitive: true, name: "[State]"}]}, function(x) {
 	
 	var population = x[0];
+	if(! ((x[1] instanceof State) || (x[1].dna.type == "State"))){
+		throw "MSG: FindState() requires a State primitive as its second argument.";
+	}
 	
 	var id = x[1].id;
 	var res = [];

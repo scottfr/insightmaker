@@ -3408,13 +3408,23 @@ A duplicate of the input array without any primitives of the specified type.
 
 
 function excludeType(array, type){
-	var res = [];
-	for(var i=0; i<array.length; i++){
-		if(array[i].value.nodeName != type){
-			res.push(array[i]);
+	if(array instanceof Array){
+		var res = [];
+		for(var i=0; i<array.length; i++){
+			if(array[i].value.nodeName != type){
+				res.push(array[i]);
+			}
 		}
+		return res;
+	}else{
+		if(array ==null){
+			return array;
+		}
+		if(array.value.nodeName == type){
+			return null
+		}
+		return array;
 	}
-	return res;
 }
 
 /*

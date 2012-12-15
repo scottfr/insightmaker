@@ -294,6 +294,10 @@ function negate(x){
 		return x.apply( negate);
 	}
 	
+	if((typeof x == 'boolean')){
+		throw "MSG: Cannot convert Booleans to Numbers.";
+	}
+	
 	return new Material(fn["-"](x.value), x.units);
 }
 
@@ -502,6 +506,10 @@ function plus(lhs, rhs){
 		return rhs.combine(lhs, plus, true);
 	}
 	
+	if((typeof lhs == 'boolean') || (typeof rhs == 'boolean')){
+		throw "MSG: Cannot convert Booleans to Numbers.";
+	}
+	
 	if (!unitsEqual(lhs.units, rhs.units)) {
 		var scale = convertUnits(rhs.units, lhs.units);
 		if (scale == 0) {
@@ -528,6 +536,10 @@ function minus(lhs, rhs){
 		return rhs.combine(lhs, minus, true);
 	}
 	
+	if((typeof lhs == 'boolean') || (typeof rhs == 'boolean')){
+		throw "MSG: Cannot convert Booleans to Numbers.";
+	}
+	
 	if (! unitsEqual(lhs.units, rhs.units)) {
 		var scale = convertUnits(rhs.units, lhs.units);
 		if (scale == 0) {
@@ -552,6 +564,10 @@ function mult(lhs, rhs){
 		return rhs.combine(lhs, mult, true);
 	}
 	
+	if((typeof lhs == 'boolean') || (typeof rhs == 'boolean')){
+		throw "MSG: Cannot convert Booleans to Numbers.";
+	}
+	
 	var x = new Material(fn["*"](lhs.value, rhs.value), lhs.units.clone());
 	x.units.multiplyUnitStore(rhs.units, 1);
 	x.simplify();
@@ -567,6 +583,10 @@ function div(lhs, rhs){
 		return lhs.combine(rhs, div, false);
 	}else if(rhs instanceof Vector){
 		return rhs.combine(lhs, div, true);
+	}
+	
+	if((typeof lhs == 'boolean') || (typeof rhs == 'boolean')){
+		throw "MSG: Cannot convert Booleans to Numbers.";
 	}
 	
 	var x = new Material(fn["/"](lhs.value, rhs.value), lhs.units.clone());
@@ -601,6 +621,10 @@ function power(lhs, rhs){
 		return rhs.combine(lhs, power, true);
 	}
 	
+	if((typeof lhs == 'boolean') || (typeof rhs == 'boolean')){
+		throw "MSG: Cannot convert Booleans to Numbers.";
+	}
+	
 	for (var i = 0; i < lhs.units.exponents.length; i++) {
 		lhs.units.exponents[i] = lhs.units.exponents[i] * rhs.value;
 	}
@@ -621,6 +645,10 @@ function doMod(lhs, rhs){
 		return lhs.combine(rhs, doMod, false);
 	}else if(rhs instanceof Vector){
 		return rhs.combine(lhs, doMod, true);
+	}
+	
+	if((typeof lhs == 'boolean') || (typeof rhs == 'boolean')){
+		throw "MSG: Cannot convert Booleans to Numbers.";
 	}
 	
 	if (rhs.units.unitless()) {
@@ -686,8 +714,6 @@ funcEvalMap["FUNCALL"] = function(node, scope) {
 			throw "MSG: The function \"" + node.children[0].origText + "\" does not exist.";
 		}
 	}
-	
-
 	var vals = [];
 	
 	if(node.delayEvalParams){
@@ -721,15 +747,15 @@ function makeFunctionCall(varName, varNames, varDefaults, node) {
 			var names = [];
 			for (var i = 0; i < fn.localScope["nVars"]; i++) {
 				if(fn.defaults.length - (fn.localScope["nVars"]-i)>-1){
-					names.push(this.localScope[i += ""] + "=" + this.defaults[fn.defaults.length - (fn.localScope["nVars"]-i)]);
+					names.push(fn.localScope[i += ""] + "=" + fn.defaults[fn.defaults.length - (fn.localScope["nVars"]-i)]);
 				}else{
-					names.push(this.localScope[i += ""]);
+					names.push(fn.localScope[i += ""]);
 				}
 			}
 			
 			throw "MSG: Wrong number of parameters for " + varName + "("+names.join(", ")+").";
 		}
-		//console.log(this.localScope);
+		//console.log(fn.localScope);
 		for (var i = 0; i < x.length; i++) {
 			fn.localScope[fn.localScope[i += ""]] = x[i];
 		}
@@ -754,7 +780,7 @@ function makeFunctionCall(varName, varNames, varDefaults, node) {
 funcEvalMap["WHILE"] = function(node, scope) {
 	var lastResult = new Material(0);
 	var innerScope = {"-parent": scope};
-	while(trueValue(evaluateNode(node.children[0], scope))){
+	while(trueValue(evaluateNode(node.children[0], scope).toNum())){
 		lastResult = evaluateNode(node.children[1], innerScope);
 	}
 	return lastResult;
@@ -764,7 +790,7 @@ funcEvalMap["IFTHENELSE"] = function(node, scope) {
 	//console.log(node);
 	var innerScope = {"-parent": scope};
 	for(var i=0; i<node.children[0].children.length; i++){
-		if(trueValue(evaluateNode(node.children[0].children[i], scope))){
+		if(trueValue(evaluateNode(node.children[0].children[i], scope).toNum())){
 			return evaluateNode(node.children[1].children[i], innerScope);
 		}
 	}
@@ -794,16 +820,16 @@ funcEvalMap["FORIN"] = function(node, scope) {
 funcEvalMap["FOR"] = function(node, scope) {
 	var lastResult = new Material(0);
 	var id = node.children[0].text;
-	var start = evaluateNode(node.children[1].children[0], scope);
+	var start = evaluateNode(node.children[1].children[0], scope).toNum();
 	var by = new Material(1);
 	
 	if(node.children[1].children.length==3){
-		by = evaluateNode(node.children[1].children[2], scope);
+		by = evaluateNode(node.children[1].children[2], scope).toNum();
 	}
 	var innerScope = {"-parent": scope};
 
 	innerScope[id] = start;
-	while(fn["<="](innerScope[id].value, evaluateNode(node.children[1].children[1], scope))){
+	while(fn["<="](innerScope[id].value, evaluateNode(node.children[1].children[1], scope).toNum())){
 		lastResult = evaluateNode(node.children[2].children[0], innerScope);
 		innerScope[id] = plus(innerScope[id], by);
 	}

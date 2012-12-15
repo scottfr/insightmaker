@@ -201,6 +201,31 @@ function testAgents(){
 	
 	clearModel();
 	
+	var s = createPrimitive("State", "State", [100,100], [100,100]);
+	var v  = createPrimitive("Variable", "State", [300,100], [100,100]);
+	var l = createConnector("My Link", "Link", s, v);
+	
+	setValue(s, "true");
+	setValue(v, "ifThenElse([State], 1, 0)");
+	res = runModel(true);
+	assertEqual("State Values 1", res.value(s)[0], 1);
+	assertEqual("State Values 2", res.value(v)[0], 1);
+	setValue(s, "false");
+	res = runModel(true);
+	assertEqual("State Values 3", res.value(s)[0], 0);
+	assertEqual("State Values 4", res.value(v)[0], 0);
+	setValue(v, "if [State] then\n 1\nelse\n 0\nend if");
+	res = runModel(true);
+	assertEqual("State Values 5", res.value(s)[0], 0);
+	assertEqual("State Values 6", res.value(v)[0], 0);
+	setValue(s, "true");
+	res = runModel(true);
+	assertEqual("State Values 7", res.value(s)[5], 1);
+	assertEqual("State Values 8", res.value(v)[5], 1);
+	
+	clearModel();
+	
+	
 	var s = createPrimitive("State 1", "State", [100,100], [100,100]);
 	var s2  = createPrimitive("State 2", "State", [100,100], [100,100]);
 	var l = createConnector("My Link", "Link", s, s2);

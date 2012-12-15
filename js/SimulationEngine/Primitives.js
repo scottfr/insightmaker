@@ -292,15 +292,16 @@ Primitive.method("setEquation", function(tree, neighborhood) {
 	}
 })
 
-function Placeholder(name, id, primitive){
+function Placeholder(dna, primitive){
 	Primitive.call(this);
-	this.name = name;
-	this.id = id;
+	this.id = dna.id;
+	this.name = dna.name;
+	this.dna = dna;
 	this.primitive = primitive;
 }
 Placeholder.inherits(Primitive);
 Placeholder.method("calculateValue",function(){
-	error("["+this.name+"] is a placeholder and cannot be used as a direct value in equations.", this.primitive, true);
+	error("["+this.dna.name+"] is a placeholder and cannot be used as a direct value in equations.", this.primitive, true);
 });
 
 function State() {
@@ -591,6 +592,7 @@ Agents.method("add", function(base){
 		var agent = new Agent();
 		agent.parent = this;
 		agent.children = [];
+		agent.childrenId = {};
 		agent.agentId = this.agentId;
 		
 		for(var i = 0; i < this.DNA.length; i++){
@@ -646,10 +648,13 @@ Agent.method("toNum", function(){
 Agent.method("agentClone", function(){
 	var agent = new Agent();
 	agent.children = [];
+	agent.childrenId = {};
+	
 	for(var i = 0; i < this.children.length; i++){
 		agent.children.push(this.children[i].clone());
+		agent.childrenId[agent.children[i].id] = agent.children[i];
 	}
-	
+
 	agent.location = this.location.clone();
 	agent.connected = this.connected.slice(0);
 	agent.parent = this.parent;
