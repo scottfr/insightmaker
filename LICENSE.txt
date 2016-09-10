@@ -1,0 +1,3 @@
+Unless otherwise noted, all contents are copyright 2010-2016 Scott Fortmann-Roe. All rights reserved.
+
+Unless otherwise noted, all files are released under the Insight Maker Public License (https://InsightMaker.com/impl). These files may be redistributed and modified according to the terms of that license.

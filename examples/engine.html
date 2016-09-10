@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	
+    <title>Insight Maker</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+
+</head>
+<body>
+
+	<script type="text/javascript" src="../js/Localization.js"></script>
+	<script type="text/javascript" src="../js/Variables.js"></script>
+	<script type="text/javascript" src="../js/Utilities.js"></script>	
+	<script type="text/javascript" src="../js/API/API.js"></script>
+	<script type="text/javascript" src="../js/mxShim.js"></script>
+	<script type="text/javascript" src="../js/Sanitize.js"></script>
+	<script type="text/javascript" src="../js/Updater.js"></script>
+	<script type="text/javascript" src="../tests/ModelTests.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/OO.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/calc/unitsStructure.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/calc/units.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/SimpleCalc.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/calc/antlr3-all-min.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/calc/output/FormulaLexer.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/calc/output/FormulaParser.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/calc/rand.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/calc/random.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/calc/formula.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/calc/functions.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/Functions.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/Classes.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/Primitives.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/TaskScheduler.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/Simulator.js"></script>
+	<script type="text/javascript" src="../js/SimulationEngine/Modeler.js"></script>
+	<script type="text/javascript" src="../resources/RedBlackNode.js"></script> 
+	<script type="text/javascript" src="../resources/RedBlackTree.js"></script> 
+	<script type="text/javascript" src="../resources/graph.js"></script>
+	
+	<p>Illustrates the use of the Insight Maker simulation engine. No dependencies on MxGraph or ExtJS are needed to run this. Try running the Insight Maker unit tests with the runTests() command in the console.</p>
+	
+	<p>Simulated time series for the Users stock from the blank model demo:</p>
+	
+		
+    <table>
+		<tr><th>Time</th><th>Users</th></tr>
+		
+	</table>
+	
+	<script>
+		function isLocal(){
+			return true; // Expose additional debugging and error messages
+		}
+	
+	
+		loadXML(blankGraphTemplate);
+		var res = runModel(true);
+		var userPrimitive = findName("Users");
+		
+		var table = document.getElementsByTagName("table")[0];
+		
+		for(var i = 0; i < res.periods; i++){
+			
+			var time = document.createElement("td");
+			time.innerHTML = res.times[i];
+			
+			var users = document.createElement("td");
+			users.innerHTML = res.value(userPrimitive)[i];
+			
+
+			var row = document.createElement("tr");
+			row.appendChild(time);
+			row.appendChild(users);
+			table.appendChild(row);
+		}
+	</script>
+	
+</body>
+</html>

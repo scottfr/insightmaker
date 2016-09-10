@@ -1,0 +1,21 @@
+v\:* {
+	behavior: url(#default#VML);
+}
+div.mxRubberband {
+	filter:alpha(opacity=30);
+}
+div.mxTooltip {
+	filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=3, OffY=3, 
+        Color='#A2A2A2', Positive='true')
+}
+div.mxPopupMenu {
+	filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=3, OffY=3, 
+        Color='#A2A2A2', Positive='true')
+}
+div.mxWindow {
+	filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=3, OffY=3, 
+        Color='#A2A2A2', Positive='true')
+}
+td.mxWindowTitle {
+ 	text-overflow:ellipsis;
+}
