@@ -17,7 +17,7 @@ function set_title(filename) {
 		title = filename+"| Insight Maker";
 		
 	} else {
-		title = "InsightMaker";
+		title = "Insight Maker";
 	}
 	window.parent.document.title = title;
 }
