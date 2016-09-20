@@ -14,7 +14,7 @@ function append_file_extension(filename,extension) {
 function set_title(filename) {
 	var title;
 	if(filename!=null) {
-		title = filename+"|InsightMaker";
+		title = filename+"| Insight Maker";
 		
 	} else {
 		title = "InsightMaker";
