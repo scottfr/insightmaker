@@ -1,9 +1,9 @@
 var InsightMakerFileExtension = ".InsightMaker";
 
 // Append file extension to file (if not already there)
-function append_file_extension(filename,extension) {
+function appendFileExtension(filename,extension) {
 	var extension_position=filename.length-extension.length;
-	var current_extension=filename.substring(extension_position,filename.length);
+	var current_extension=filename.slice(extension_position);
 	if(current_extension.toLowerCase()!=extension.toLowerCase()) {
 		filename+=extension;
 	}
@@ -11,7 +11,7 @@ function append_file_extension(filename,extension) {
 }
 
 // Set the title to include the model name
-function set_title(filename) {
+function setTitle(filename) {
 	var title;
 	if(filename!=null) {
 		title = filename+"| Insight Maker";
@@ -23,7 +23,7 @@ function set_title(filename) {
 }
 
 // Get xml data for the current model
-function get_model_xml() {
+function getModelXML() {
 	var enc = new mxCodec();
 	var graph_dom=enc.encode(graph.getModel());
 	var xml_data="<InsightMakerModel>"+graph_dom.innerHTML+"</InsightMakerModel>";
@@ -84,11 +84,11 @@ var FileManagerWeb = new function() {
 	
 	this.set_filename = function(filename) {
 		self.filename=filename;
-		set_title(filename);
+		setTitle(filename);
 	}
 	
 	this.saveModel = function() {
-		var xml_data = get_model_xml();
+		var xml_data = getModelXML();
 		
 
 
@@ -96,7 +96,7 @@ var FileManagerWeb = new function() {
 		if(model_name==null) {
 			return;
 		}
-		model_name=append_file_extension(model_name,InsightMakerFileExtension);
+		model_name=appendFileExtension(model_name,InsightMakerFileExtension);
 		self.set_filename(model_name);
 		WebFileIO.download(model_name,xml_data);
 	};
