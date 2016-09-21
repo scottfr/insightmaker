@@ -35,46 +35,15 @@ function newModel() {
 	clearModel();
 }
 
-// Class for uploading and downloading files from javascript
-var WebFileIO = new function() {
-	var upload_handler;
-	function readfile(event) {
-		var file = event.target.files[0]; 
-
-		if (file) {
-		  var reader = new FileReader();
-		  reader.onload = function(reader_event) { 
-			  var filedata = reader_event.target.result;
-			  upload_handler(file.name, filedata);	
-		  }
-		  reader.readAsText(file);
-		}
-	}
-
-	this.upload = function(tupload_handler, accepttype) {
-		var uploader = document.body.appendChild(document.createElement("input"));
-		uploader.addEventListener('change', readfile, false);
-		uploader.type="file";
-		if(accepttype!==undefined) {
-			// accepttype is file extension that we should show
-			// E.g. ".txt"
-			// If none is specified all file extensions are shown
-			uploader.accept=accepttype;
-		}
-		upload_handler = tupload_handler;
-		
-		uploader.click();
-		uploader.parentElement.removeChild(uploader);
-	};
-	
-	this.download = function(filename, content) {
-		var downloadlink = document.body.appendChild(document.createElement("a"));
-		downloadlink.download = filename;
-		downloadlink.href = "data:text/plain;base64," + btoa(content);
-		downloadlink.click();
-		downloadlink.parentElement.removeChild(downloadlink);
-	};
-}
+function downloadWebFile(filename, content) {
+	// There is already a downloadFile in API.js
+	// But it does not appear to work in Firefox
+	var downloadlink = document.body.appendChild(document.createElement("a"));
+	downloadlink.download = filename;
+	downloadlink.href = "data:text/plain;base64," + btoa(content);
+	downloadlink.click();
+	downloadlink.parentElement.removeChild(downloadlink);
+};
 
 // High-level File manager. Does save and load of models
 var FileManagerWeb = new function() {
@@ -95,7 +64,7 @@ var FileManagerWeb = new function() {
 				var xml_data = getModelXML2();
 				model_name=appendFileExtension(model_name,InsightMakerFileExtension);
 				self.set_filename(model_name);
-				WebFileIO.download(model_name,xml_data);
+				downloadWebFile(model_name,xml_data);
 			}
 		});
 
