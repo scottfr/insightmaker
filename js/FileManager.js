@@ -13,7 +13,7 @@ function appendFileExtension(filename,extension) {
 // Set the title to include the model name
 function setTitle(filename) {
 	var title;
-	if(filename!=null) {
+	if(filename) {
 		title = filename+"| Insight Maker";
 		
 	} else {
@@ -23,7 +23,7 @@ function setTitle(filename) {
 }
 
 // Get xml data for the current model
-function getModelXML() {
+function getModelXML2() {
 	var enc = new mxCodec();
 	var graph_dom=enc.encode(graph.getModel());
 	var xml_data="<InsightMakerModel>"+graph_dom.innerHTML+"</InsightMakerModel>";
@@ -70,7 +70,6 @@ var WebFileIO = new function() {
 	this.download = function(filename, content) {
 		var downloadlink = document.body.appendChild(document.createElement("a"));
 		downloadlink.download = filename;
-		
 		downloadlink.href = "data:text/plain;base64," + btoa(content);
 		downloadlink.click();
 		downloadlink.parentElement.removeChild(downloadlink);
@@ -88,17 +87,18 @@ var FileManagerWeb = new function() {
 	}
 	
 	this.saveModel = function() {
-		var xml_data = getModelXML();
-		
+		Ext.MessageBox.prompt('Model name', 'Enter name of model', function(btn, model_name){
+			if(btn=='cancel') {
+				return;
+			}
+			if (btn == 'ok'){
+				var xml_data = getModelXML2();
+				model_name=appendFileExtension(model_name,InsightMakerFileExtension);
+				self.set_filename(model_name);
+				WebFileIO.download(model_name,xml_data);
+			}
+		});
 
-
-		var model_name=prompt("Enter name of model");
-		if(model_name==null) {
-			return;
-		}
-		model_name=appendFileExtension(model_name,InsightMakerFileExtension);
-		self.set_filename(model_name);
-		WebFileIO.download(model_name,xml_data);
 	};
 	
 	this.loadModel = function() {
