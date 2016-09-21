@@ -102,10 +102,15 @@ var FileManagerWeb = new function() {
 	};
 	
 	this.loadModel = function() {
-		WebFileIO.upload(function(filename,model_data) {
-		importMXGraph(model_data);
-		self.set_filename(filename);
-		},InsightMakerFileExtension);
+		openFile({
+			read: "text",
+			multiple: false,
+			accept: InsightMakerFileExtension,
+			onCompleted: function(model) {
+				importMXGraph(model.contents);
+				self.set_filename(model.name);
+			}
+		});
 	};
 	
 	this.newModel = function() {
