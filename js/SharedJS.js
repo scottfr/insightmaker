@@ -8,7 +8,22 @@ terms of the Insight Maker Public License (https://InsightMaker.com/impl).
 
 */
 
+var environment = {
+	InsightMakerOnline: 1,
+	WebOffline: 2,
+	NodeWebKit: 3 /* Not yet implmented. Suggestion for future */
+}
+
+function environmentAutoDetect() {
+	if(location.hostname.match("insightmaker.com")!=null) {
+		return environment.InsightMakerOnline;
+	} else {
+		return environment.WebOffline;
+	}
+}
+
 var viewConfig = {
+	environment: environmentAutoDetect(),
 	showTopLinks: true,
 	sideBarWidth: 330,
 	referenceBarWidth: 240,

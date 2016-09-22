@@ -1087,7 +1087,7 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 		collapsible: false,
 		tbar: new Ext.toolbar.Toolbar({
 			enableOverflow: true,
-			items: [
+			items: FileMenu.concat([
 
 				{
 					hidden: (!viewConfig.primitiveGroup),
@@ -1641,7 +1641,7 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 				}
 				
 
-			]
+			])
 		})
 
 	});
