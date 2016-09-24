@@ -1241,13 +1241,7 @@ var downloadButton = function(name){
 				          res += "\r\n" + cells.join(",");
 				        });
 
-						/*downloadFile(name, res);*/
-
-						new mxXmlRequest(builder_path + "/download.php", $.param({
-							name: name,
-							"format": "csv",
-							"data": res
-						})).simulate(document, "_blank");
+						downloadFile(name+".csv", res);
 					}
 				};
 			}
@@ -1341,9 +1335,5 @@ var downloadButton = function(name){
 
 				var xml = (mxUtils.getXml(root));
 
-				new mxXmlRequest(builder_path + "/download.php", $.param({
-					name: "Insight Maker Diagram",
-					"format": "svg",
-					"data": xml
-				})).simulate(document, "_blank");
+				downloadFile("Insight Maker Diagram.svg", xml)
 			};
