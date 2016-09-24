@@ -1515,8 +1515,7 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 							menu: [{
 									text: getText("Download Insight Maker File"),
 									handler: function(){
-										/*downloadFile("Model.InsightMaker", getGraphXml(graph).replace(/mxGraphModel/g,"InsightMakerModel"));*/
-										new mxXmlRequest(builder_path + "/download.php", $.param({name: "Model", format: "InsightMaker", "data": getGraphXml(graph).replace(/mxGraphModel/g,"InsightMakerModel")})).simulate(document, "_blank");
+										downloadFile("Model.InsightMaker", getGraphXml(graph).replace(/mxGraphModel/g,"InsightMakerModel"));
 									}
 								},'-',
 								{

@@ -227,7 +227,6 @@ data - The data to download.
 */
 
 function downloadFile(fileName, data) {
-	alert(data);
 	var downloadlink = document.body.appendChild(document.createElement("a"));
 	downloadlink.download = fileName;
 	downloadlink.href = "data:text/plain;base64," + btoa(unescape(encodeURIComponent(data)));
