@@ -112,7 +112,7 @@ menu: [
 var FileMenu;
 switch(viewConfig.environment) {
 	case environment.InsightMakerOnline:
-		FileMenu = [];
+		FileMenu = {};
 		ExportMenu = {
 			text: getText("Download Insight Maker File"),
 			handler: function(){
@@ -125,7 +125,7 @@ switch(viewConfig.environment) {
 		},'-';
 		break;
 	case environment.WebOffline:
-		FileMenu = [FileMenuWeb];
+		FileMenu = FileMenuWeb;
 		ExportMenu = {};
 		ImportMenu = {};
 		break;

@@ -1087,8 +1087,7 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 		collapsible: false,
 		tbar: new Ext.toolbar.Toolbar({
 			enableOverflow: true,
-			items: FileMenu.concat([
-
+			items: FileMenu,
 				{
 					hidden: (!viewConfig.primitiveGroup),
 					text: getText('Add Primitive'),
@@ -1629,9 +1628,6 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 					href: '//InsightMaker.com',
 					tooltip: 'Insight Maker Home'
 				}
-				
-
-			])
 		})
 
 	});
