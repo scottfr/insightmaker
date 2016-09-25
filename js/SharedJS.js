@@ -9,21 +9,14 @@ terms of the Insight Maker Public License (https://InsightMaker.com/impl).
 */
 
 var environment = {
+	AutoDetect: 0,
 	InsightMakerOnline: 1,
 	WebOffline: 2,
 	NodeWebKit: 3 /* Not yet implmented. Suggestion for future */
 }
 
-function environmentAutoDetect() {
-	if(location.hostname.match("insightmaker.com")!=null) {
-		return environment.InsightMakerOnline;
-	} else {
-		return environment.WebOffline;
-	}
-}
-
 var viewConfig = {
-	environment: environmentAutoDetect(),
+	environment: environment.AutoDetect,
 	showTopLinks: true,
 	sideBarWidth: 330,
 	referenceBarWidth: 240,
@@ -42,6 +35,30 @@ var viewConfig = {
 	fullScreenResults: false,
 	showResultsEdit: true
 };
+environmentConfig();
+
+function environmentAutoDetect() {
+	if(location.hostname.match("insightmaker.com")!=null) {
+		return environment.InsightMakerOnline;
+	} else {
+		return environment.WebOffline;
+	}
+}
+
+function environmentConfig() {
+	if(viewConfig.environment==environment.AutoDetect) {
+		viewConfig.environment = environmentAutoDetect();
+	}
+	switch(viewConfig.environment) {
+		case environment.InsightMakerOnline:
+		
+			break;
+		case environment.WebOffline:
+			viewConfig.saveEnabled=false;
+			viewConfig.showTopLinks=false;
+			break;
+	}
+}
 
 if(is_ebook){
 	viewConfig.showTopLinks = false;
