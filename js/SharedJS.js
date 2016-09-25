@@ -95,7 +95,6 @@ if(is_embed){
 }
 
 if(! is_editor){
-	viewConfig.showImportExport=true;
 	viewConfig.saveEnabled = false;
 	viewConfig.primitiveGroup = false;
 	viewConfig.connectionsGroup = false;
