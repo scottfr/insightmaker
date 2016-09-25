@@ -1497,8 +1497,13 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 											y: 100
 										});
 									}
-								}, ImportMenu,
-								{
+								}, {
+									hidden: (!viewConfig.showImportExport),
+									text: getText("Insight Maker File..."),
+									handler: importInsightMaker
+								},
+
+								'-', {
 									text: getText("XMILE File... <span style='color: #bbb'>(Experimental)<span>"),
 									handler: importXMILE
 								}
@@ -1508,7 +1513,13 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 							hidden: (!is_editor),
 							text: "Export",
 							glyph: 0xf019,
-							menu: [ExportMenu,
+							menu: [{
+									hidden: (!viewConfig.showImportExport),
+									text: getText("Download Insight Maker File"),
+									handler: function(){
+										downloadFile("Model.InsightMaker", getGraphXml(graph).replace(/mxGraphModel/g,"InsightMakerModel"));
+									}
+								},'-',
 								{
 									/*hidden: (!is_editor),*/
 									itemId: 'textBut',

@@ -33,7 +33,8 @@ var viewConfig = {
 	toolsGroup: true,
 	exploreGroup: false,
 	fullScreenResults: false,
-	showResultsEdit: true
+	showResultsEdit: true,
+	showImportExport: true
 };
 environmentConfig();
 
@@ -56,6 +57,7 @@ function environmentConfig() {
 		case environment.WebOffline:
 			viewConfig.saveEnabled=false;
 			viewConfig.showTopLinks=false;
+			viewConfig.showImportExport=false;
 			break;
 	}
 }
@@ -93,6 +95,7 @@ if(is_embed){
 }
 
 if(! is_editor){
+	viewConfig.showImportExport=true;
 	viewConfig.saveEnabled = false;
 	viewConfig.primitiveGroup = false;
 	viewConfig.connectionsGroup = false;

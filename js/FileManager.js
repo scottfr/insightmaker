@@ -113,20 +113,8 @@ var FileMenu;
 switch(viewConfig.environment) {
 	case environment.InsightMakerOnline:
 		FileMenu = [];
-		ExportMenu = {
-			text: getText("Download Insight Maker File"),
-			handler: function(){
-				downloadFile("Model.InsightMaker", getGraphXml(graph).replace(/mxGraphModel/g,"InsightMakerModel"));
-			}
-		},'-';
-		ImportMenu = {
-			text: getText("Insight Maker File..."),
-			handler: importInsightMaker
-		},'-';
 		break;
 	case environment.WebOffline:
 		FileMenu = [FileMenuWeb];
-		ExportMenu = {};
-		ImportMenu = {};
 		break;
 }
