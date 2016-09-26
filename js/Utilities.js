@@ -1335,5 +1335,5 @@ var downloadButton = function(name){
 
 				var xml = (mxUtils.getXml(root));
 
-				downloadFile("Insight Maker Diagram.svg", xml)
+				downloadFile("Insight Maker Diagram.svg", xml);
 			};
