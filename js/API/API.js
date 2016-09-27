@@ -233,16 +233,16 @@ function downloadFile(fileName, data) {
 	
 	// Create download link and click it
 	var a = document.createElement("a");
-    a.style.display="none";
-    a.href = url;
+	a.style.display="none";
+	a.href = url;
 	a.download = fileName;
-    document.body.appendChild(a);
+	document.body.appendChild(a);
 	a.click();
 	
 	// The setTimeout is a fix to make it work in Firefox
 	// Without it, the objectURL is removed before the click-event is triggered
 	// And the download does not work
-    setTimeout(function() {
+	setTimeout(function() {
 		window.URL.revokeObjectURL(url);
 		a.remove();
 	},1);
