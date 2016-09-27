@@ -227,11 +227,16 @@ data - The data to download.
 */
 
 function downloadFile(fileName, data) {
-	var downloadlink = document.body.appendChild(document.createElement("a"));
-	downloadlink.download = fileName;
-	downloadlink.href = "data:text/plain;base64," + btoa(unescape(encodeURIComponent(data)));
-	downloadlink.click();
-	downloadlink.parentElement.removeChild(downloadlink);
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+	
+	var blob = new Blob([data], {type: "octet/stream"}),
+	    url = window.URL.createObjectURL(blob);
+	a.href = url;
+	a.download = fileName;
+	a.click();
+	window.URL.revokeObjectURL(url);
+	a.remove();
 };
 
 /*
