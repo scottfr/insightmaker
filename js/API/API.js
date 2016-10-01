@@ -227,16 +227,25 @@ data - The data to download.
 */
 
 function downloadFile(fileName, data) {
-    var a = document.createElement("a");
-    document.body.appendChild(a);
-	
+	// Create Blob and attach it to ObjectURL
 	var blob = new Blob([data], {type: "octet/stream"}),
-	    url = window.URL.createObjectURL(blob);
+	url = window.URL.createObjectURL(blob);
+	
+	// Create download link and click it
+	var a = document.createElement("a");
+	a.style.display="none";
 	a.href = url;
 	a.download = fileName;
+	document.body.appendChild(a);
 	a.click();
-	window.URL.revokeObjectURL(url);
-	a.remove();
+	
+	// The setTimeout is a fix to make it work in Firefox
+	// Without it, the objectURL is removed before the click-event is triggered
+	// And the download does not work
+	setTimeout(function() {
+		window.URL.revokeObjectURL(url);
+		a.remove();
+	},1);
 };
 
 /*

@@ -1498,6 +1498,7 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 										});
 									}
 								}, {
+									hidden: (!viewConfig.showImportExport),
 									text: getText("Insight Maker File..."),
 									handler: importInsightMaker
 								},
@@ -1513,10 +1514,10 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 							text: "Export",
 							glyph: 0xf019,
 							menu: [{
+									hidden: (!viewConfig.showImportExport),
 									text: getText("Download Insight Maker File"),
 									handler: function(){
-										/*downloadFile("Model.InsightMaker", getGraphXml(graph).replace(/mxGraphModel/g,"InsightMakerModel"));*/
-										new mxXmlRequest(builder_path + "/download.php", $.param({name: "Model", format: "InsightMaker", "data": getGraphXml(graph).replace(/mxGraphModel/g,"InsightMakerModel")})).simulate(document, "_blank");
+										downloadFile("Model.InsightMaker", getGraphXml(graph).replace(/mxGraphModel/g,"InsightMakerModel"));
 									}
 								},'-',
 								{

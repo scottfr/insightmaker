@@ -35,16 +35,6 @@ function newModel() {
 	clearModel();
 }
 
-function downloadWebFile(filename, content) {
-	// There is already a downloadFile in API.js
-	// But it does not appear to work in Firefox
-	var downloadlink = document.body.appendChild(document.createElement("a"));
-	downloadlink.download = filename;
-	downloadlink.href = "data:text/plain;base64," + btoa(content);
-	downloadlink.click();
-	downloadlink.parentElement.removeChild(downloadlink);
-};
-
 // High-level File manager. Does save and load of models
 var FileManagerWeb = new function() {
 	var self = this;
@@ -64,7 +54,7 @@ var FileManagerWeb = new function() {
 				var xml_data = getModelXML2();
 				model_name=appendFileExtension(model_name,InsightMakerFileExtension);
 				self.set_filename(model_name);
-				downloadWebFile(model_name,xml_data);
+				downloadFile(model_name,xml_data);
 			}
 		});
 
