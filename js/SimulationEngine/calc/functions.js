@@ -76,11 +76,19 @@ defineFunction("RandBinomial", {params: [{name:"Count", noUnits:true, noVector:t
 defineFunction("RandNegativeBinomial", {params: [{name:"Successes", noUnits:true, noVector:true}, {name:"Probability", noUnits:true, noVector:true}]}, function(x){
 	return new Material(RandNegativeBinomial(x[0].toNum().value, x[1].toNum().value));
 });
+defineFunction("RandBinomialFlow", {params: [{name:"Count", noUnits:true, noVector:true}, {name:"Probability", noUnits:true, noVector:true}]}, function(x){
+        var dt=simulate.timeStep.toNum().value;
+        return new Material(RandBinomial(x[0].toNum().value, dt*x[1].toNum().value)/dt);
+});
 defineFunction("RandGamma", {params:[{name:"Alpha", noUnits:true, noVector:true}, {name:"Beta", noUnits:true, noVector:true}]}, function(x){
 	return new Material(RandGamma(x[0].toNum().value, x[1].toNum().value));
 });
 defineFunction("RandPoisson", {params:[{name:"Rate", noUnits:true, noVector:true}]}, function(x){
 	return new Material(RandPoisson(x[0].toNum().value));
+});
+defineFunction("RandPoissonFlow", {params:[{name:"Rate", noUnits:true, noVector:true}]}, function(x){
+        var dt=simulate.timeStep.toNum().value;
+        return new Material(RandPoisson(dt*x[0].toNum().value)/dt);
 });
 defineFunction("RandTriangular", {params:[{name:"Minimum", noUnits:true, noVector:true}, {name:"Maximum", noUnits:true, noVector:true}, {name:"Peak", noUnits:true, noVector:true}]}, function(x){
 	return new Material(RandTriangular(x[0].toNum().value, x[1].toNum().value, x[2].toNum().value));
