@@ -1,0 +1,3 @@
+All code in this diretory is third party to Insight Maker and not covered by the Insight Maker Public License.
+
+Using Insight Maker does not necessarily give you the right to use the code in this directory. To confirm your right to use these libraries, you must check with their respective authors and license holders.
